@@ -20,12 +20,15 @@ export const UserSchema = new mongoose.Schema({
     required: true,
   },
   role: {
+    type: String,
     enum: ['ADMIN', 'PROFESSOR', 'STUDENT'],
     required: true,
   },
+  salt: String,
 });
 
 export interface User extends Document {
+  salt: any;
   email: string;
   password: string;
   role: string;
