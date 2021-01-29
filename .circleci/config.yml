@@ -12,9 +12,9 @@ jobs:
       - run:
           command: npm run test
 workflows:
-  build-and-test:
-    jobs:
-      - build-and-test
+#  build-and-test:
+#    jobs:
+#      - build-and-test
   heroku_deploy:
     jobs:
       - heroku/deploy-via-git
