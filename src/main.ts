@@ -8,6 +8,5 @@ async function bootstrap() {
     new ValidationPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST }),
   );
   await app.listen(process.env.PORT || 3000);
-  console.log('listening on 3000 ....');
 }
 bootstrap();

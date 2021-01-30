@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import * as dotenv from 'dotenv';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { UsersModule } from '../users/users.module';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 @Module({
