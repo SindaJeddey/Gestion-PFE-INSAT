@@ -1,6 +1,4 @@
 import * as mongoose from 'mongoose';
-import { Document } from 'mongoose';
-
 export const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -27,7 +25,7 @@ export const UserSchema = new mongoose.Schema({
   salt: String,
 });
 
-export interface User extends Document {
+export interface User extends mongoose.Document {
   salt: any;
   email: string;
   password: string;
