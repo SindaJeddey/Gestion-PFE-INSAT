@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Professor } from './model/professor.model';
 import { NewProfessorDto } from './model/dto/new-professor.dto';
 import { UsersService } from '../users/users.service';
-import { RolesEnum } from '../users/model/roles.enum';
+import { Roles } from '../users/model/roles';
 
 @Injectable()
 export class ProfessorsService {
@@ -17,7 +17,7 @@ export class ProfessorsService {
     const professor = new this.professorModel(newProfessor);
     const savedUser = this.userService.newUser({
       email: newProfessor.email,
-      role: RolesEnum.PROFESSOR,
+      role: Roles.PROFESSOR,
     });
     if (savedUser) return await professor.save();
   }
