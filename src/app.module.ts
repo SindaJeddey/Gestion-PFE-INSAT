@@ -6,6 +6,9 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { UsersModule } from './users/users.module';
 import { StudentsModule } from './students/students.module';
 import { ProfessorsModule } from './professors/professors.module';
+import { SessionsModule } from './sessions/sessions.module';
+import { ProjectsModule } from './projects/projects.module';
+import { ConferencesModule } from './conferences/conferences.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -20,6 +23,9 @@ dotenv.config();
     UsersModule,
     StudentsModule,
     ProfessorsModule,
+    SessionsModule,
+    ProjectsModule,
+    ConferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

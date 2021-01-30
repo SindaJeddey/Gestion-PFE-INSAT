@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { Project, ProjectSchema } from '../../projects/model/project.model';
 
 export const StudentSchema = new mongoose.Schema({
   email: {
@@ -30,7 +31,7 @@ export const StudentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  project: String,
+  project: ProjectSchema,
   field: {
     type: String,
     enum: ['GL', 'RT', 'IMI', 'IIA', 'CH', 'BIO'],
@@ -43,6 +44,6 @@ export interface Student extends mongoose.Document {
   nce: string;
   name: string;
   lastName: string;
-  project: string;
+  project: Project;
   field: string;
 }

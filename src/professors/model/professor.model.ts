@@ -1,4 +1,9 @@
 import * as mongoose from 'mongoose';
+import {
+  Conference,
+  ConferenceSchema,
+} from '../../conferences/model/conference.model';
+import { Project, ProjectSchema } from '../../projects/model/project.model';
 
 export const ProfessorSchema = new mongoose.Schema({
   email: {
@@ -27,11 +32,11 @@ export const ProfessorSchema = new mongoose.Schema({
     enum: ['GPI', 'GIM', 'GBC'],
     required: true,
   },
-  currentSupervisedProject: String,
-  oldSupervisedProjects: [String],
+  currentSupervisedProject: ProjectSchema,
+  oldSupervisedProjects: [ProjectSchema],
   conferences: [
     {
-      conference: String,
+      conference: ConferenceSchema,
       role: { type: String, enum: ['President', 'Supervisor', 'Inspector'] },
     },
   ],
@@ -42,7 +47,7 @@ export interface Professor extends mongoose.Document{
   name: string;
   lastName: string;
   department: string;
-  supervisedStudent: string;
-  oldSupervisedProjects: [string];
+  currentSupervisedProject: Project;
+  oldSupervisedProjects: [Project];
   conferences: [];
 }
