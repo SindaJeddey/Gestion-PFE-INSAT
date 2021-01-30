@@ -5,7 +5,9 @@ import { Student } from './model/student.model';
 
 @Controller('students')
 export class StudentsController {
-  constructor(private studentsService: StudentsService) {}
+  constructor(
+    private studentsService: StudentsService,
+  ) {}
 
   @Post()
   async addStudent(@Body() newStudent: NewStudentDto): Promise<Student> {

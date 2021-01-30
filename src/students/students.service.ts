@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Student } from './model/student.model';
@@ -23,7 +23,9 @@ export class StudentsService {
   }
 
   async getStudent(email: string): Promise<Student> {
-    return await this.studentModel.findOne({ email }).exec();
+    const student = await this.studentModel.findOne({ email }).exec();
+    if (!student) throw new NotFoundException('Student not found');
+    return student;
   }
 
   async getAllStudent(): Promise<Student[]> {
