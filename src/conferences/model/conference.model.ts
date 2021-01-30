@@ -1,10 +1,7 @@
 import * as mongoose from 'mongoose';
-import { Session, SessionSchema } from '../../sessions/model/session.model';
-import {
-  Professor,
-  ProfessorSchema,
-} from '../../professors/model/professor.model';
-import { Project, ProjectSchema } from '../../projects/model/project.model';
+import { Session } from '../../sessions/model/session.model';
+import { Professor } from '../../professors/model/professor.model';
+import { Project } from '../../projects/model/project.model';
 
 export const ConferenceSchema = new mongoose.Schema({
   date: {
@@ -12,23 +9,28 @@ export const ConferenceSchema = new mongoose.Schema({
     required: true,
   },
   session: {
-    type: SessionSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Session',
     required: true,
   },
   president: {
-    type: ProfessorSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Professor',
     required: true,
   },
   inspector: {
-    type: ProfessorSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Professor',
     required: true,
   },
   supervisor: {
-    type: ProfessorSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Professor',
     required: true,
   },
   project: {
-    type: ProjectSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project',
     required: true,
   },
   room: {

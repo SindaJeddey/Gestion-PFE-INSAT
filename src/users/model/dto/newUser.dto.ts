@@ -6,10 +6,6 @@ export class NewUserDto {
   @IsNotEmpty()
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
   @IsEnum(RolesEnum)
   @IsNotEmpty()
   role: string;

@@ -13,11 +13,16 @@ export class UsersService {
     return await this.userModel.findOne({ email }).exec();
   }
 
-  async newUser(newUser: NewUserDto): Promise<User> {
+  async newUser(newUser: NewUserDto) {
     const user = new this.userModel(newUser);
     user.salt = await bcrypt.genSalt();
-    user.password = await bcrypt.hash(user.password, user.salt);
+    const password = UsersService.generatePassword();
+    user.password = await bcrypt.hash(password, user.salt);
+    //envoyer mail
     return await user.save();
   }
 
+  private static generatePassword(): string {
+    return Math.random().toString(36).slice(-8);
+  }
 }

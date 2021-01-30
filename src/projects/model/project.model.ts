@@ -1,13 +1,7 @@
 import * as mongoose from 'mongoose';
-import { StudentSchema, Student } from '../../students/model/student.model';
-import {
-  ProfessorSchema,
-  Professor,
-} from '../../professors/model/professor.model';
-import {
-  Conference,
-  ConferenceSchema,
-} from '../../conferences/model/conference.model';
+import { Student } from '../../students/model/student.model';
+import { Professor } from '../../professors/model/professor.model';
+import { Conference } from '../../conferences/model/conference.model';
 
 export const ProjectSchema = new mongoose.Schema({
   tile: {
@@ -22,13 +16,22 @@ export const ProjectSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
-  conference: ConferenceSchema,
+  conference: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Conference',
+  },
   student: {
-    type: StudentSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
     required: true,
   },
   supervisor: {
-    type: ProfessorSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Professor',
+    required: true,
+  },
+  academicYear: {
+    type: String,
     required: true,
   },
 });

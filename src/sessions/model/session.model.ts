@@ -1,12 +1,6 @@
 import * as mongoose from 'mongoose';
-import {
-  ProfessorSchema,
-  Professor,
-} from '../../professors/model/professor.model';
-import {
-  Conference,
-  ConferenceSchema,
-} from '../../conferences/model/conference.model';
+import { Professor } from '../../professors/model/professor.model';
+import { Conference } from '../../conferences/model/conference.model';
 
 export const SessionSchema = new mongoose.Schema({
   startDate: {
@@ -18,10 +12,17 @@ export const SessionSchema = new mongoose.Schema({
     required: true,
   },
   president: {
-    type: ProfessorSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Professor',
     required: true,
   },
-  conferences: [ConferenceSchema],
+  conferences: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Conference',
+      required: true,
+    },
+  ],
   capacity: {
     type: Number,
     required: true,
