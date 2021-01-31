@@ -1,15 +1,16 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthenticationModule } from './authentication/authentication.module';
-import { UsersModule } from './users/users.module';
-import { StudentsModule } from './students/students.module';
-import { ProfessorsModule } from './professors/professors.module';
-import { SessionsModule } from './sessions/sessions.module';
-import { ProjectsModule } from './projects/projects.module';
-import { ConferencesModule } from './conferences/conferences.module';
-import * as dotenv from 'dotenv';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthenticationModule } from "./authentication/authentication.module";
+import { UsersModule } from "./users/users.module";
+import { StudentsModule } from "./students/students.module";
+import { ProfessorsModule } from "./professors/professors.module";
+import { SessionsModule } from "./sessions/sessions.module";
+import { ProjectsModule } from "./projects/projects.module";
+import { ConferencesModule } from "./conferences/conferences.module";
+import * as dotenv from "dotenv";
+import { IdVerificationMiddleware } from "./middlewares/id-verification.middleware";
 
 dotenv.config();
 @Module({
@@ -30,4 +31,10 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer): any {
+    consumer
+      .apply(IdVerificationMiddleware)
+      .forRoutes({ path: 'students/:id', method: RequestMethod.GET });
+  }
+}
