@@ -31,10 +31,13 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer
       .apply(IdVerificationMiddleware)
-      .forRoutes({ path: 'students/:id', method: RequestMethod.GET });
+      .forRoutes(
+        { path: '*/:id', method: RequestMethod.GET },
+        { path: '*/:id', method: RequestMethod.PUT },
+      );
   }
 }

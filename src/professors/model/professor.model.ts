@@ -28,6 +28,16 @@ export const ProfessorSchema = new mongoose.Schema({
     enum: ['GPI', 'GMI', 'GBC'],
     required: true,
   },
+  rank: {
+    type: String,
+    enum: [
+      'PROFESSOR',
+      'MAITRE DE CONFERENCES',
+      'MAITRE ASSISTANT',
+      'ASSISTANT',
+    ],
+    required: true,
+  },
 });
 
 export interface Professor extends Document {
@@ -35,4 +45,5 @@ export interface Professor extends Document {
   name: string;
   lastName: string;
   department: string;
+  rank: string;
 }

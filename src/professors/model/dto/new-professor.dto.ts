@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Departments } from '../departments.enum';
+import { Ranks } from '../ranks.enum';
 
 export class NewProfessorDto {
   @IsEmail()
@@ -18,4 +19,9 @@ export class NewProfessorDto {
   @IsNotEmpty()
   @IsEnum(Departments)
   department: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Ranks)
+  rank: string;
 }
