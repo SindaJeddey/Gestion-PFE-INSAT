@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Fields } from '../fields.enum';
+import { Levels } from '../levels.enum';
 
 export class NewStudentDto {
   @IsEmail()
@@ -22,4 +23,9 @@ export class NewStudentDto {
   @IsEnum(Fields)
   @IsNotEmpty()
   field: string;
+
+  @IsString()
+  @IsEnum(Levels)
+  @IsNotEmpty()
+  level: string;
 }

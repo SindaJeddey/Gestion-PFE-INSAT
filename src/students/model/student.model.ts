@@ -35,6 +35,11 @@ export const StudentSchema = new mongoose.Schema({
     enum: ['GL', 'RT', 'IMI', 'IIA', 'CH', 'BIO'],
     required: true,
   },
+  level: {
+    type: String,
+    enum: ['CYCLE', 'MASTER', 'LICENCE'],
+    required: true,
+  },
 });
 
 export interface Student extends mongoose.Document {
@@ -43,4 +48,5 @@ export interface Student extends mongoose.Document {
   name: string;
   lastName: string;
   field: string;
+  level: string;
 }
