@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { Professor } from "./model/professor.model";
-import { NewProfessorDto } from "./model/dto/new-professor.dto";
-import { UsersService } from "../users/users.service";
-import { Roles } from "../users/model/roles";
-import { UpdatedProfessorDto } from "./model/dto/updated-professor.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Professor } from './model/professor.model';
+import { NewProfessorDto } from './model/dto/new-professor.dto';
+import { UsersService } from '../users/users.service';
+import { Roles } from '../users/model/roles';
+import { UpdatedProfessorDto } from './model/dto/updated-professor.dto';
 
 @Injectable()
 export class ProfessorsService {
@@ -37,10 +37,12 @@ export class ProfessorsService {
     id: string,
     updates: UpdatedProfessorDto,
   ): Promise<Professor> {
-    return this.professorModel.findByIdAndUpdate(
+    const professor = this.professorModel.findByIdAndUpdate(
       id,
       { ...updates },
       { new: true },
     );
+    if (!professor) throw new NotFoundException('Professor not found');
+    return professor;
   }
 }

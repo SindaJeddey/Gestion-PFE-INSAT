@@ -33,6 +33,14 @@ export const ProjectSchema = new mongoose.Schema({
     },
     required: true,
   },
+  validity: {
+    type: Boolean,
+  },
+  level: {
+    type: String,
+    enum: ['CYCLE', 'MASTER', 'LICENCE'],
+    required: true,
+  },
 });
 
 export interface Project extends mongoose.Document {
@@ -41,5 +49,7 @@ export interface Project extends mongoose.Document {
   tags: string[];
   student: Student;
   supervisor: Professor;
+  validity: boolean;
+  level: string;
   academicYear: string;
 }
