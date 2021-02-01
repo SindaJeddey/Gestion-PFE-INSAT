@@ -49,12 +49,12 @@ export class ProjectsService {
       enterprise = await this.enterpriseService.getEnterprise(
         newProject.enterprise,
       );
-    else if (newProject.enterprise instanceof EnterpriseDto) {
+    else {
       enterprise = await this.enterpriseService.addEnterprise(
         newProject.enterprise,
       );
     }
-
+    console.log(newProject.enterprise instanceof EnterpriseDto);
     if (!newProject.tags) newProject.tags = [student.field];
     const project = new this.projectModel({
       ...newProject,

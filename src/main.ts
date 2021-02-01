@@ -2,12 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationErrorFilter } from './filters/validation-error.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST }),
   );
+  app.useGlobalFilters(new ValidationErrorFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Gestion PFE')
