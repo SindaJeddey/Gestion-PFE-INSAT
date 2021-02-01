@@ -11,6 +11,7 @@ import { ProjectsModule } from "./projects/projects.module";
 import { ConferencesModule } from "./conferences/conferences.module";
 import * as dotenv from "dotenv";
 import { IdVerificationMiddleware } from "./middlewares/id-verification.middleware";
+import { AcademicYearModule } from './academic-year/academic-year.module';
 
 dotenv.config();
 @Module({
@@ -27,6 +28,7 @@ dotenv.config();
     SessionsModule,
     ProjectsModule,
     ConferencesModule,
+    AcademicYearModule,
   ],
   controllers: [AppController],
   providers: [AppService],

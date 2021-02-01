@@ -30,7 +30,7 @@ export class ProjectsController {
 
   //by student
   @Put()
-  @ApiOperation({ description: 'Updating a project by the student.' })
+  @ApiOperation({ description: 'Updating a project by the student. Student Id will be passed in the token' })
   @ApiResponse({ status: 201, description: 'Project successfully updated.' })
   @ApiResponse({ status: 404, description: 'Project not found or Student not found.' })
   async updateProject(
