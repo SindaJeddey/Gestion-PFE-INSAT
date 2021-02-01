@@ -6,13 +6,19 @@ import { ProjectsController } from './projects.controller';
 import { UsersModule } from '../users/users.module';
 import { StudentsModule } from '../students/students.module';
 import { ProfessorsModule } from '../professors/professors.module';
+import { EnterpriseSchema } from '../enterprises/model/enterprise.model';
+import { EnterprisesModule } from "../enterprises/enterprises.module";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Project', schema: ProjectSchema }]),
+    MongooseModule.forFeature([
+      { name: 'Project', schema: ProjectSchema },
+      { name: 'Enterprise', schema: EnterpriseSchema },
+    ]),
     UsersModule,
     StudentsModule,
     ProfessorsModule,
+    EnterprisesModule,
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],

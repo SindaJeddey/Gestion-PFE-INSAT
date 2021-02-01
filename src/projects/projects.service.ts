@@ -10,6 +10,10 @@ import { NewProjectDto } from './model/dto/new-project.dto';
 import { StudentsService } from '../students/students.service';
 import { ProfessorsService } from '../professors/professors.service';
 import { UpdatedProjectDto } from './model/dto/updated-project.dto';
+import { Enterprise } from '../enterprises/model/enterprise.model';
+import mongoose from 'mongoose';
+import { EnterprisesService } from '../enterprises/enterprises.service';
+import { EnterpriseDto } from '../enterprises/model/dto/enterprise.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -17,6 +21,7 @@ export class ProjectsService {
     @InjectModel('Project') private projectModel: Model<Project>,
     private studentsService: StudentsService,
     private professorsService: ProfessorsService,
+    private enterpriseService: EnterprisesService,
   ) {}
 
   async addProject(newProject: NewProjectDto): Promise<Project> {
@@ -38,6 +43,18 @@ export class ProjectsService {
     const supervisor = await this.professorsService.getProfessor(
       newProject.supervisor,
     );
+
+    let enterprise;
+    if (typeof newProject.enterprise === 'string')
+      enterprise = await this.enterpriseService.getEnterprise(
+        newProject.enterprise,
+      );
+    else if (newProject.enterprise instanceof EnterpriseDto) {
+      enterprise = await this.enterpriseService.addEnterprise(
+        newProject.enterprise,
+      );
+    }
+
     if (!newProject.tags) newProject.tags = [student.field];
     const project = new this.projectModel({
       ...newProject,
@@ -45,12 +62,14 @@ export class ProjectsService {
       supervisor,
       validity: false,
       level: student.level,
+      enterprise,
     });
+
     return await project.save();
   }
 
-  async getStudentProject(id: string): Promise<Project> {
-    const student = await this.studentsService.getStudent(id);
+  async getStudentProject(studentId: string): Promise<Project> {
+    const student = await this.studentsService.getStudent(studentId);
     const project = await this.projectModel
       .findOne({ student: student })
       .exec();
@@ -60,10 +79,10 @@ export class ProjectsService {
   }
 
   async updateProject(
-    id: string,
+    studentId: string,
     updates: UpdatedProjectDto,
   ): Promise<Project> {
-    const student = await this.studentsService.getStudent(id);
+    const student = await this.studentsService.getStudent(studentId);
     const project = await this.projectModel.findOneAndUpdate(
       { student },
       { ...updates },
@@ -73,11 +92,21 @@ export class ProjectsService {
     return project;
   }
 
-  async validateProject(id: string) {
-    const project = await this.projectModel.findByIdAndUpdate(id, {
+  async validateProject(projectId: string) {
+    const project = await this.projectModel.findByIdAndUpdate(projectId, {
       validity: true,
     });
     if (!project) throw new NotFoundException('Project Not Found');
   }
 
+  async deleteProjectByStudent(studentId: string) {
+    const student = await this.studentsService.getStudent(studentId);
+    const project = await this.projectModel.findOneAndDelete({ student });
+    if (!project) throw new NotFoundException('Project not found');
+  }
+
+  async deleteProjectByAdmin(projectId: string) {
+    const project = await this.projectModel.findByIdAndDelete(projectId);
+    if (!project) throw new NotFoundException('Project not found');
+  }
 }

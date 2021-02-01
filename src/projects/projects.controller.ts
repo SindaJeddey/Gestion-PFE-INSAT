@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { ProjectsService } from './projects.service';
 import { NewProjectDto } from './model/dto/new-project.dto';
 import { Project } from './model/project.model';
@@ -29,12 +29,13 @@ export class ProjectsController {
   }
 
   //by student
+  //body student will be replaced later with the id in the token
   @Put()
   @ApiOperation({ description: 'Updating a project by the student. Student Id will be passed in the token' })
   @ApiResponse({ status: 201, description: 'Project successfully updated.' })
   @ApiResponse({ status: 404, description: 'Project not found or Student not found.' })
   async updateProject(
-    @Body('id') id: string,
+    @Body('student') id: string,
     @Body('updates') updates: UpdatedProjectDto,
   ): Promise<Project> {
     return await this.projectsService.updateProject(id, updates);
@@ -47,5 +48,23 @@ export class ProjectsController {
   @ApiResponse({ status: 404, description: 'Project not found.' })
   async validateProject(@Param('id') id: string) {
     await this.projectsService.validateProject(id);
+  }
+
+  //by student
+  @Delete()
+  @ApiOperation({ description: 'Deleting a project by the student.' })
+  @ApiResponse({ status: 201, description: 'Project successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Project not found.' })
+  async deleteProjectByStudent(@Body('student') id: string) {
+    await this.projectsService.deleteProjectByStudent(id);
+  }
+
+  //by admin
+  @Delete(':id')
+  @ApiOperation({ description: 'Deleting a project by the admin.' })
+  @ApiResponse({ status: 201, description: 'Project successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Project not found.' })
+  async deleteProjectByAdmin(@Param('id') projectId: string) {
+    await this.projectsService.deleteProjectByAdmin(projectId);
   }
 }
