@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class EnterpriseDto{
+export class NewEnterpriseDto{
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -12,4 +12,5 @@ export class EnterpriseDto{
   @IsString()
   @IsNotEmpty()
   contact: string;
+
 }
