@@ -6,13 +6,20 @@ import {
   Get,
   Param,
   Post,
-  Put, Query
+  Put,
+  Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { NewProjectDto } from './model/dto/new-project.dto';
 import { Project } from './model/project.model';
 import { UpdatedProjectDto } from './model/dto/updated-project.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+
+enum SupervisedProjects {
+  CURRENT = 'current',
+  ALL = 'all',
+  OLD = 'old',
+}
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -61,12 +68,13 @@ export class ProjectsController {
 
   //by professor or admin
   @Get('professor/:id')
-  @ApiOperation({ description: 'Retrieving projects supervised by a professor. Query param projects will determine if we need to fetch current or old projects or all of them' })
+  @ApiOperation({ description: 'Retrieving projects supervised by a professor' })
   @ApiResponse({ status: 201, description: 'Projects successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Professor not found.' })
+  @ApiQuery({ name: 'filter', enum:SupervisedProjects, description:'Filter projects to retrieve: all, old or currently supervised by given professor' })
   async getProfessorSupervisedProjects(
     @Param('id') id: string,
-    @Query('projects') state: string,
+    @Query('filter') state: string,
   ): Promise<Project[]> {
     if (['current', 'old', 'all'].indexOf(state) > -1)
       return await this.projectsService.getProfessorSupervisedProjects(
