@@ -1,19 +1,13 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Project } from './model/project.model';
-import { NewProjectDto } from './model/dto/new-project.dto';
-import { StudentsService } from '../students/students.service';
-import { ProfessorsService } from '../professors/professors.service';
-import { UpdatedProjectDto } from './model/dto/updated-project.dto';
-import { Enterprise } from '../enterprises/model/enterprise.model';
-import mongoose from 'mongoose';
-import { EnterprisesService } from '../enterprises/enterprises.service';
-import { EnterpriseDto } from '../enterprises/model/dto/enterprise.dto';
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Project } from "./model/project.model";
+import { NewProjectDto } from "./model/dto/new-project.dto";
+import { StudentsService } from "../students/students.service";
+import { ProfessorsService } from "../professors/professors.service";
+import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
+import { EnterprisesService } from "../enterprises/enterprises.service";
+import { AcademicYearService } from "../academic-year/academic-year.service";
 
 @Injectable()
 export class ProjectsService {
@@ -22,6 +16,7 @@ export class ProjectsService {
     private studentsService: StudentsService,
     private professorsService: ProfessorsService,
     private enterpriseService: EnterprisesService,
+    private academicYearService: AcademicYearService,
   ) {}
 
   async addProject(newProject: NewProjectDto): Promise<Project> {
@@ -54,14 +49,15 @@ export class ProjectsService {
         newProject.enterprise,
       );
     }
-    console.log(newProject.enterprise instanceof EnterpriseDto);
     if (!newProject.tags) newProject.tags = [student.field];
+    const academicYear = await this.academicYearService.getCurrentAcademicYear();
     const project = new this.projectModel({
       ...newProject,
       student,
       supervisor,
       validity: false,
       level: student.level,
+      academicYear: academicYear._id,
       enterprise,
     });
 
@@ -76,6 +72,20 @@ export class ProjectsService {
     if (!project)
       throw new NotFoundException("Student doesn't have a project yet");
     return project;
+  }
+
+  async getProfessorSupervisedProjects(
+    professorId: string,
+    state: string,
+  ): Promise<Project[]> {
+    const supervisor = await this.professorsService.getProfessor(professorId);
+    let filter;
+    if (state !== 'all') {
+      const academicYear = await this.academicYearService.getCurrentAcademicYear();
+      if (state === 'current') filter = { supervisor, academicYear };
+      else filter = { supervisor, academicYear: { $ne: academicYear } };
+    }
+    return await this.projectModel.find(filter).exec();
   }
 
   async updateProject(

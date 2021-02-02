@@ -23,8 +23,8 @@ export class ProfessorsService {
     if (savedUser) return await professor.save();
   }
 
-  async getProfessor(id: string): Promise<Professor> {
-    const professor = await this.professorModel.findById(id).exec();
+  async getProfessor(professorId: string): Promise<Professor> {
+    const professor = await this.professorModel.findById(professorId);
     if (!professor) throw new NotFoundException('Professor not found');
     return professor;
   }

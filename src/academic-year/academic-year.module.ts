@@ -10,6 +10,7 @@ import { AcademicYearController } from './academic-year.controller';
       { name: 'AcademicYear', schema: AcademicYearSchema },
     ]),
   ],
+  exports: [AcademicYearService],
   providers: [AcademicYearService],
   controllers: [AcademicYearController],
 })

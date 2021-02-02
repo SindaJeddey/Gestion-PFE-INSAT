@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { Student } from '../../students/model/student.model';
 import { Professor } from '../../professors/model/professor.model';
 import { Enterprise } from '../../enterprises/model/enterprise.model';
+import { AcademicYear } from "../../academic-year/model/academic-year.model";
 
 export const ProjectSchema = new mongoose.Schema({
   title: {
@@ -34,6 +35,11 @@ export const ProjectSchema = new mongoose.Schema({
     enum: ['CYCLE', 'MASTER', 'LICENCE'],
     required: true,
   },
+  academicYear: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AcademicYear',
+    required: true,
+  },
   enterprise: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Enterprise',
@@ -49,5 +55,6 @@ export interface Project extends mongoose.Document {
   supervisor: Professor;
   validity: boolean;
   level: string;
+  academicYear: AcademicYear;
   enterprise: Enterprise;
 }

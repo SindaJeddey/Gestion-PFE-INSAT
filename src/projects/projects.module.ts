@@ -8,6 +8,7 @@ import { StudentsModule } from '../students/students.module';
 import { ProfessorsModule } from '../professors/professors.module';
 import { EnterpriseSchema } from '../enterprises/model/enterprise.model';
 import { EnterprisesModule } from "../enterprises/enterprises.module";
+import { AcademicYearModule } from "../academic-year/academic-year.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { EnterprisesModule } from "../enterprises/enterprises.module";
     StudentsModule,
     ProfessorsModule,
     EnterprisesModule,
+    AcademicYearModule
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],
