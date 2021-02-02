@@ -1,13 +1,17 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { Project } from "./model/project.model";
-import { NewProjectDto } from "./model/dto/new-project.dto";
-import { StudentsService } from "../students/students.service";
-import { ProfessorsService } from "../professors/professors.service";
-import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
-import { EnterprisesService } from "../enterprises/enterprises.service";
-import { AcademicYearService } from "../academic-year/academic-year.service";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Project } from './model/project.model';
+import { NewProjectDto } from './model/dto/new-project.dto';
+import { StudentsService } from '../students/students.service';
+import { ProfessorsService } from '../professors/professors.service';
+import { UpdatedProjectDto } from './model/dto/updated-project.dto';
+import { EnterprisesService } from '../enterprises/enterprises.service';
+import { AcademicYearService } from '../academic-year/academic-year.service';
 
 @Injectable()
 export class ProjectsService {
@@ -55,6 +59,7 @@ export class ProjectsService {
       ...newProject,
       student,
       supervisor,
+      acceptedBySupervisor: false,
       validity: false,
       level: student.level,
       academicYear: academicYear._id,
@@ -64,10 +69,10 @@ export class ProjectsService {
     return await project.save();
   }
 
-  async getStudentProject(studentId: string): Promise<Project> {
+  async getStudentCurrentProject(studentId: string): Promise<Project> {
     const student = await this.studentsService.getStudent(studentId);
     const project = await this.projectModel
-      .findOne({ student: student })
+      .findOne({ student: student, level: student.level })
       .exec();
     if (!project)
       throw new NotFoundException("Student doesn't have a project yet");
@@ -103,15 +108,38 @@ export class ProjectsService {
   }
 
   async validateProject(projectId: string) {
-    const project = await this.projectModel.findByIdAndUpdate(projectId, {
-      validity: true,
-    });
-    if (!project) throw new NotFoundException('Project Not Found');
+    const project = await this.projectModel.findOneAndUpdate(
+      { _id: projectId, acceptedBySupervisor: true },
+      {
+        validity: true,
+      },
+    );
+    if (!project)
+      throw new NotFoundException(
+        'Project Not Found or not accepted by supervisor yet',
+      );
+  }
+
+  //By Professor
+  async acceptProject(
+    professorId: string,
+    projectId: string,
+  ): Promise<Project> {
+    const project = await this.projectModel.findById(projectId);
+    console.log(typeof project.supervisor._id.toString());
+    console.log(typeof professorId);
+    if (project.supervisor._id.toString() !== professorId)
+      throw new ConflictException(
+        "Current Project doesn't correspond to the supervisor");
+    return await project.update({ acceptedBySupervisor: true });
   }
 
   async deleteProjectByStudent(studentId: string) {
     const student = await this.studentsService.getStudent(studentId);
-    const project = await this.projectModel.findOneAndDelete({ student });
+    const project = await this.projectModel.findOneAndDelete({
+      student,
+      level: student.level,
+    });
     if (!project) throw new NotFoundException('Project not found');
   }
 

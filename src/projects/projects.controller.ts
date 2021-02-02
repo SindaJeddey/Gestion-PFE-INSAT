@@ -43,8 +43,8 @@ export class ProjectsController {
     status: 404,
     description: 'Project not found or Student not found.',
   })
-  async getStudentProject(@Body('id') id: string): Promise<Project> {
-    return await this.projectsService.getStudentProject(id);
+  async getStudentCurrentProject(@Body('id') id: string): Promise<Project> {
+    return await this.projectsService.getStudentCurrentProject(id);
   }
 
   //by student
@@ -88,9 +88,20 @@ export class ProjectsController {
   @Put('validate/:id')
   @ApiOperation({ description: 'Validating a project by the admin.' })
   @ApiResponse({ status: 201, description: 'Project successfully validated.' })
-  @ApiResponse({ status: 404, description: 'Project not found.' })
-  async validateProject(@Param('id') id: string) {
+  @ApiResponse({ status: 404, description: 'Project not found or not accepted by supervisor yet.' })
+  async validateProjectByAdmin(@Param('id') id: string) {
     await this.projectsService.validateProject(id);
+  }
+
+  @Put('accept/:id')
+  @ApiOperation({ description: 'Validating a project by the supervisor.' })
+  @ApiResponse({ status: 201, description: 'Project successfully accepted.' })
+  @ApiResponse({ status: 404, description: 'Project not found .' })
+  async acceptProjectBySupervisor(
+    @Param('id') id: string,
+    @Body('supervisor') supervisorId: string,
+  ) {
+    await this.projectsService.acceptProject(supervisorId, id);
   }
 
   //by student

@@ -29,6 +29,11 @@ export const ProjectSchema = new mongoose.Schema({
   },
   validity: {
     type: Boolean,
+    required: true,
+  },
+  acceptedBySupervisor: {
+    type: Boolean,
+    required: true,
   },
   level: {
     type: String,
@@ -53,6 +58,7 @@ export interface Project extends mongoose.Document {
   tags: string[];
   student: Student;
   supervisor: Professor;
+  acceptedBySupervisor: boolean;
   validity: boolean;
   level: string;
   academicYear: AcademicYear;
