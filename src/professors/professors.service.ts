@@ -25,7 +25,8 @@ export class ProfessorsService {
 
   async getProfessor(professorId: string): Promise<Professor> {
     const professor = await this.professorModel.findById(professorId);
-    if (!professor) throw new NotFoundException('Professor not found');
+    if (!professor)
+      throw new NotFoundException(`Professor ${professorId} not found`);
     return professor;
   }
 
@@ -34,15 +35,18 @@ export class ProfessorsService {
   }
 
   async updateProfessor(
-    id: string,
+    professorId: string,
     updates: UpdatedProfessorDto,
   ): Promise<Professor> {
     const professor = this.professorModel.findByIdAndUpdate(
-      id,
+      professorId,
       { ...updates },
       { new: true },
     );
-    if (!professor) throw new NotFoundException('Professor not found');
+    if (!professor)
+      throw new NotFoundException(`Professor ${professorId} not found`);
     return professor;
   }
+
+  //search professors with filter
 }

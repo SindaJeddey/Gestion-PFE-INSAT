@@ -5,7 +5,7 @@ import { Student } from './model/student.model';
 import { UsersService } from '../users/users.service';
 import { NewStudentDto } from './model/dto/new-student.dto';
 import { Roles } from '../users/model/roles';
-import { UpdatedStudentDto } from "./model/dto/updated-student.dto";
+import { UpdatedStudentDto } from './model/dto/updated-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -20,12 +20,12 @@ export class StudentsService {
       email: newStudent.email,
       role: Roles.STUDENT,
     });
-    if (savedStudent) return await student.save();
+    return await student.save();
   }
 
   async getStudent(id: string): Promise<Student> {
     const student = await this.studentModel.findById(id).exec();
-    if (!student) throw new NotFoundException('Student not found');
+    if (!student) throw new NotFoundException(`Student id ${id} not found`);
     return student;
   }
 
@@ -37,10 +37,13 @@ export class StudentsService {
     id: string,
     updates: UpdatedStudentDto,
   ): Promise<Student> {
-    return this.studentModel.findByIdAndUpdate(
+    const updatedStudent = this.studentModel.findByIdAndUpdate(
       id,
       { ...updates },
       { new: true },
     );
+    if (!updatedStudent)
+      throw new NotFoundException(`Student id ${id} not found`);
+    return updatedStudent;
   }
 }

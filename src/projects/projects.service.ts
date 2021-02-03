@@ -28,21 +28,21 @@ export class ProjectsService {
 
     const projects = await this.projectModel.find({ student: student }).exec();
     if (projects.length === 3) {
-      throw new ConflictException('Student already has 3 projects');
+      throw new ConflictException(
+        `Student id ${newProject.student} already has 3 projects`,
+      );
     } else {
       const existingProject = projects.filter(
         (project) => project.level === student.level,
       );
       if (existingProject.length !== 0)
         throw new ConflictException(
-          'Student already has a project for his level',
+          `Student id ${newProject.student} already has a project for his level`,
         );
     }
-
     const supervisor = await this.professorsService.getProfessor(
       newProject.supervisor,
     );
-
     let enterprise;
     if (typeof newProject.enterprise === 'string')
       enterprise = await this.enterpriseService.getEnterprise(
@@ -65,7 +65,6 @@ export class ProjectsService {
       academicYear: academicYear._id,
       enterprise,
     });
-
     return await project.save();
   }
 
@@ -75,7 +74,9 @@ export class ProjectsService {
       .findOne({ student: student, level: student.level })
       .exec();
     if (!project)
-      throw new NotFoundException("Student doesn't have a project yet");
+      throw new NotFoundException(
+        `Student id ${studentId} doesn't have a project yet`,
+      );
     return project;
   }
 
@@ -103,7 +104,10 @@ export class ProjectsService {
       { ...updates },
       { new: true },
     );
-    if (!project) throw new NotFoundException('Project Not Found');
+    if (!project)
+      throw new NotFoundException(
+        `Project for Student id ${studentId} Not Found`,
+      );
     return project;
   }
 
@@ -116,7 +120,7 @@ export class ProjectsService {
     );
     if (!project)
       throw new NotFoundException(
-        'Project Not Found or not accepted by supervisor yet',
+        `Project ${projectId} Not Found or not accepted by supervisor yet`,
       );
   }
 
@@ -126,11 +130,11 @@ export class ProjectsService {
     projectId: string,
   ): Promise<Project> {
     const project = await this.projectModel.findById(projectId);
-    console.log(typeof project.supervisor._id.toString());
-    console.log(typeof professorId);
+    if (!project) throw new NotFoundException(`Project ${projectId} Not Found`);
     if (project.supervisor._id.toString() !== professorId)
       throw new ConflictException(
-        "Current Project doesn't correspond to the supervisor");
+        `Project ${projectId} doesn't correspond to supervisor ${professorId}`,
+      );
     return await project.update({ acceptedBySupervisor: true });
   }
 
@@ -140,11 +144,15 @@ export class ProjectsService {
       student,
       level: student.level,
     });
-    if (!project) throw new NotFoundException('Project not found');
+    if (!project)
+      throw new NotFoundException(
+        `Project for student id ${studentId} Not Found`,
+      );
   }
 
   async deleteProjectByAdmin(projectId: string) {
     const project = await this.projectModel.findByIdAndDelete(projectId);
-    if (!project) throw new NotFoundException('Project not found');
+    if (!project)
+      throw new NotFoundException(`Project id ${projectId} Not Found`);
   }
 }

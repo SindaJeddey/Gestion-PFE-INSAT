@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AcademicYear } from './model/academic-year.model';
@@ -33,6 +33,8 @@ export class AcademicYearService {
       startDate: { $lte: now },
       endDate: { $gte: now },
     });
+    if (!currentAcademicYear)
+      throw new NotFoundException(`There is no current academic year`)
     return currentAcademicYear;
   }
 }

@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { EnterpriseDto } from '../../../enterprises/model/dto/enterprise.dto';
-import any = jasmine.any;
 
 export class NewProjectDto {
   @IsString()

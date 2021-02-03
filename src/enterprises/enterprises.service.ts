@@ -19,11 +19,10 @@ export class EnterprisesService {
     return this.enterpriseModel.find().exec();
   }
 
-  async getEnterprise(id: string): Promise<Enterprise> {
-    const enterprise = await this.enterpriseModel.findById(id);
-    if(!enterprise)
-      throw new NotFoundException('Enterprise not found')
+  async getEnterprise(enterpriseId: string): Promise<Enterprise> {
+    const enterprise = await this.enterpriseModel.findById(enterpriseId);
+    if (!enterprise)
+      throw new NotFoundException(`Enterprise id ${enterpriseId} not found`);
     return enterprise;
   }
 }
-
