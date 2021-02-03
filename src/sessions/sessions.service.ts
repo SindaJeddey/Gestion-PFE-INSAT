@@ -37,12 +37,38 @@ export class SessionsService {
 
   async getSession(sessionId: string): Promise<Session> {
     const session = await this.sessionModel.findById(sessionId).exec();
-    if (!session) throw new NotFoundException('Session not found');
+    if (!session)
+      throw new NotFoundException(`Session id ${sessionId} not found`);
     return session;
   }
 
-  //By admin
   async getAllSessions(): Promise<Session[]> {
     return await this.sessionModel.find().exec();
+  }
+
+  async updateSession(
+    sessionId: string,
+    updates: UpdatedSessionDto,
+  ): Promise<Session> {
+    if (updates.president !== undefined) {
+      const president = await this.professorsService.getProfessor(
+        updates.president,
+      );
+      updates.president = president;
+    }
+    const updatedSession = await this.sessionModel.findByIdAndUpdate(
+      sessionId,
+      { ...updates },
+      { new: true },
+    );
+    if (!updatedSession)
+      throw new NotFoundException(`Session id ${sessionId} not found`);
+    return updatedSession;
+  }
+
+  async deleteSession(sessionId: string) {
+    const session = await this.sessionModel.findByIdAndDelete(sessionId);
+    if (!session)
+      throw new NotFoundException(`Session id ${sessionId} not found`);
   }
 }
