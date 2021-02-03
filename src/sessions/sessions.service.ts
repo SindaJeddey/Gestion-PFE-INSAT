@@ -45,7 +45,4 @@ export class SessionsService {
   async getAllSessions(): Promise<Session[]> {
     return await this.sessionModel.find().exec();
   }
-
-
-
 }
