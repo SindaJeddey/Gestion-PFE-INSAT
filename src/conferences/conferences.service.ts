@@ -153,4 +153,12 @@ export class ConferencesService {
     }
     return await oldConference.update(updates, { new: true });
   }
+
+  async deleteConference(conferenceId: string) {
+    const conference = await this.conferenceModel.findByIdAndDelete(
+      conferenceId,
+    );
+    if (!conference)
+      throw new NotFoundException(`Conference id ${conferenceId} not found`);
+  }
 }
