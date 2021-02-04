@@ -28,6 +28,10 @@ export const ConferenceSchema = new mongoose.Schema({
     ref: 'Professor',
     required: true,
   },
+  enterpriseSupervisor: {
+    type: String,
+    required: true,
+  },
   project: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
@@ -35,14 +39,18 @@ export const ConferenceSchema = new mongoose.Schema({
   },
   room: {
     type: String,
+    required: true,
+    enum: ['2B6-1', '2B6-2', '2B6-3', '2B6-4'],
   },
 });
 
 export interface Conference extends mongoose.Document {
   date: Date;
+  room: string;
   session: Session;
   president: Professor;
   inspector: Professor;
   supervisor: Professor;
+  enterpriseSupervisor: string;
   project: Project;
 }

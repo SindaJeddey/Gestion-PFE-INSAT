@@ -30,4 +30,9 @@ export class NewProjectDto {
   @IsNotEmpty()
   @ApiProperty({ type: EnterpriseDto, required: true })
   enterprise: EnterpriseDto | string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true})
+  enterpriseSupervisor: string;
 }

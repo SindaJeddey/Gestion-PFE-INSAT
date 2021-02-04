@@ -68,6 +68,14 @@ export class ProjectsService {
     return await project.save();
   }
 
+  //by admin
+  async getProject(projectId: string): Promise<Project> {
+    const project = await this.projectModel.findById(projectId);
+    if (!project)
+      throw new NotFoundException(`Project id ${projectId} Not Found`);
+    else return project;
+  }
+
   async getStudentCurrentProject(studentId: string): Promise<Project> {
     const student = await this.studentsService.getStudent(studentId);
     const project = await this.projectModel

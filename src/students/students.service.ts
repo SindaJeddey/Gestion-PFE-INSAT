@@ -16,7 +16,7 @@ export class StudentsService {
 
   async addStudent(newStudent: NewStudentDto): Promise<Student> {
     const student = new this.studentModel(newStudent);
-    const savedStudent = this.userService.newUser({
+    const savedStudent = await this.userService.newUser({
       email: newStudent.email,
       role: Roles.STUDENT,
     });
@@ -37,7 +37,7 @@ export class StudentsService {
     id: string,
     updates: UpdatedStudentDto,
   ): Promise<Student> {
-    const updatedStudent = this.studentModel.findByIdAndUpdate(
+    const updatedStudent = await this.studentModel.findByIdAndUpdate(
       id,
       { ...updates },
       { new: true },

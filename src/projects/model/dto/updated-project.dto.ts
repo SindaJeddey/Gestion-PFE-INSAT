@@ -16,4 +16,5 @@ export class UpdatedProjectDto {
   @IsOptional()
   @ApiProperty({ type: [String], required: false })
   tags: string[];
+
 }

@@ -20,8 +20,9 @@ import { AcademicYearModule } from "../academic-year/academic-year.module";
     StudentsModule,
     ProfessorsModule,
     EnterprisesModule,
-    AcademicYearModule
+    AcademicYearModule,
   ],
+  exports: [ProjectsService],
   providers: [ProjectsService],
   controllers: [ProjectsController],
 })

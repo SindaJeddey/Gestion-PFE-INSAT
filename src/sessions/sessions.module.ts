@@ -13,6 +13,7 @@ import { SessionsController } from './sessions.controller';
     ProfessorsModule,
   ],
   providers: [SessionsService],
+  exports: [SessionsService],
   controllers: [SessionsController],
 })
 export class SessionsModule {}

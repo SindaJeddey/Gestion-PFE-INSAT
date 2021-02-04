@@ -13,7 +13,7 @@ import { ProjectsService } from './projects.service';
 import { NewProjectDto } from './model/dto/new-project.dto';
 import { Project } from './model/project.model';
 import { UpdatedProjectDto } from './model/dto/updated-project.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 enum SupervisedProjects {
   CURRENT = 'current',

@@ -50,6 +50,10 @@ export const ProjectSchema = new mongoose.Schema({
     ref: 'Enterprise',
     required: true,
   },
+  enterpriseSupervisor: {
+    type: String,
+    required: true,
+  },
 });
 
 export interface Project extends mongoose.Document {
@@ -63,4 +67,5 @@ export interface Project extends mongoose.Document {
   level: string;
   academicYear: AcademicYear;
   enterprise: Enterprise;
+  enterpriseSupervisor: string;
 }

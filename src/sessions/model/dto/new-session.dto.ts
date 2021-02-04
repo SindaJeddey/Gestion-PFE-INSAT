@@ -22,6 +22,6 @@ export class NewSessionDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ type: String, required: true })
+  @ApiProperty({ type: String, required: true, description: `President ID` })
   president: string;
 }
