@@ -12,6 +12,7 @@ import { ProfessorsService } from '../professors/professors.service';
 import { UpdatedProjectDto } from './model/dto/updated-project.dto';
 import { EnterprisesService } from '../enterprises/enterprises.service';
 import { AcademicYearService } from '../academic-year/academic-year.service';
+import { MailingService } from '../mailing/mailing.service';
 
 @Injectable()
 export class ProjectsService {
@@ -21,6 +22,7 @@ export class ProjectsService {
     private professorsService: ProfessorsService,
     private enterpriseService: EnterprisesService,
     private academicYearService: AcademicYearService,
+    private mailingService: MailingService,
   ) {}
 
   async addProject(newProject: NewProjectDto): Promise<Project> {
@@ -65,7 +67,20 @@ export class ProjectsService {
       academicYear: academicYear._id,
       enterprise,
     });
-    return await project.save();
+    const saved = await project.save();
+    if (saved) {
+      await this.mailingService.sendEmail(
+        student.email,
+        'New Project',
+        `Dear ${student.name} ${student.lastName},\n Your project "${project.title}" has been added. Please check the platform for more details.`,
+      );
+      await this.mailingService.sendEmail(
+        supervisor.email,
+        'New project pending',
+        `Dear ${supervisor.name} ${supervisor.lastName},\n You have a new project pending. Please check the platform for more details.`,
+      );
+    }
+    return saved;
   }
 
   //by admin
@@ -116,6 +131,11 @@ export class ProjectsService {
       throw new NotFoundException(
         `Project for Student id ${studentId} Not Found`,
       );
+    await this.mailingService.sendEmail(
+      student.email,
+      'Project Update',
+      `Dear ${student.name} ${student.lastName},\n Your project "${project.title}" has been updated. Please check the updates on the platform.`,
+    );
     return project;
   }
 
@@ -130,6 +150,13 @@ export class ProjectsService {
       throw new NotFoundException(
         `Project ${projectId} Not Found or not accepted by supervisor yet`,
       );
+    else {
+      await this.mailingService.sendEmail(
+        project.student.email,
+        'Project Validated',
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been validated. Please check the updates on the platform.`
+      );
+    }
   }
 
   //By Professor
@@ -143,7 +170,15 @@ export class ProjectsService {
       throw new ConflictException(
         `Project ${projectId} doesn't correspond to supervisor ${professorId}`,
       );
-    return await project.update({ acceptedBySupervisor: true });
+
+    const updated = await project.update({ acceptedBySupervisor: true }, {new: true});
+    if (updated)
+      await this.mailingService.sendEmail(
+        project.student.email,
+        'Project Accepted',
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been accepted by ${project.supervisor.name} ${project.supervisor.lastName}. Please check the updates on the platform.`,
+      );
+    return updated;
   }
 
   async deleteProjectByStudent(studentId: string) {
@@ -156,11 +191,25 @@ export class ProjectsService {
       throw new NotFoundException(
         `Project for student id ${studentId} Not Found`,
       );
+    else {
+      await this.mailingService.sendEmail(
+        project.student.email,
+        'Project Deleted',
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the updates on the platform.`
+      );
+    }
   }
 
   async deleteProjectByAdmin(projectId: string) {
     const project = await this.projectModel.findByIdAndDelete(projectId);
     if (!project)
       throw new NotFoundException(`Project id ${projectId} Not Found`);
+    else {
+      await this.mailingService.sendEmail(
+        project.student.email,
+        'Project Deleted',
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the updates on the platform.`,
+      );
+    }
   }
 }

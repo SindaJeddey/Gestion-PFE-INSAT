@@ -6,12 +6,14 @@ import { NewProfessorDto } from './model/dto/new-professor.dto';
 import { UsersService } from '../users/users.service';
 import { Roles } from '../users/model/roles';
 import { UpdatedProfessorDto } from './model/dto/updated-professor.dto';
+import { MailingService } from '../mailing/mailing.service';
 
 @Injectable()
 export class ProfessorsService {
   constructor(
     @InjectModel('Professor') private professorModel: Model<Professor>,
     private userService: UsersService,
+    private mailingService: MailingService,
   ) {}
 
   async addNewProfessor(newProfessor: NewProfessorDto): Promise<Professor> {
@@ -38,15 +40,20 @@ export class ProfessorsService {
     professorId: string,
     updates: UpdatedProfessorDto,
   ): Promise<Professor> {
-    const professor = this.professorModel.findByIdAndUpdate(
+    const professor = await this.professorModel.findByIdAndUpdate(
       professorId,
       { ...updates },
       { new: true },
     );
     if (!professor)
       throw new NotFoundException(`Professor ${professorId} not found`);
-    return professor;
+    else {
+      await this.mailingService.sendEmail(
+        professor.email,
+        'Profile Update',
+        `Dear ${professor.name} ${professor.lastName},\n Your profile has been updated. Please check the platform for more details.`,
+      );
+      return professor;
+    }
   }
-
-  //search professors with filter
 }

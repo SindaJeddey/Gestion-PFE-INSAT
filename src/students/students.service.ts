@@ -6,12 +6,14 @@ import { UsersService } from '../users/users.service';
 import { NewStudentDto } from './model/dto/new-student.dto';
 import { Roles } from '../users/model/roles';
 import { UpdatedStudentDto } from './model/dto/updated-student.dto';
+import { MailingService } from '../mailing/mailing.service';
 
 @Injectable()
 export class StudentsService {
   constructor(
     @InjectModel('Student') private studentModel: Model<Student>,
     private userService: UsersService,
+    private mailingService: MailingService,
   ) {}
 
   async addStudent(newStudent: NewStudentDto): Promise<Student> {
@@ -20,7 +22,7 @@ export class StudentsService {
       email: newStudent.email,
       role: Roles.STUDENT,
     });
-    return await student.save();
+    if (savedStudent) return await student.save();
   }
 
   async getStudent(id: string): Promise<Student> {
@@ -44,6 +46,13 @@ export class StudentsService {
     );
     if (!updatedStudent)
       throw new NotFoundException(`Student id ${id} not found`);
-    return updatedStudent;
+    else {
+      await this.mailingService.sendEmail(
+        updatedStudent.email,
+        'Profile Update',
+        `Dear ${updatedStudent.name} ${updatedStudent.lastName},\n Your profile has been updated. Please check the platform for more details.`,
+      );
+      return updatedStudent;
+    }
   }
 }

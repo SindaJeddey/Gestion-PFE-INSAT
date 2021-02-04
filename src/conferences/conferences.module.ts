@@ -6,6 +6,7 @@ import { ConferenceSchema } from './model/conference.model';
 import { ProjectsModule } from '../projects/projects.module';
 import { ProfessorsModule } from '../professors/professors.module';
 import { SessionsModule } from '../sessions/sessions.module';
+import { MailingModule } from "../mailing/mailing.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SessionsModule } from '../sessions/sessions.module';
     ProfessorsModule,
     ProjectsModule,
     SessionsModule,
+    MailingModule,
   ],
   controllers: [ConferencesController],
   providers: [ConferencesService],

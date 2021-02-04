@@ -14,6 +14,7 @@ import { Professor } from '../professors/model/professor.model';
 import { Session } from '../sessions/model/session.model';
 import { Project } from '../projects/model/project.model';
 import { UpdateConferenceDto } from './model/dto/update-conference.dto';
+import { MailingService } from '../mailing/mailing.service';
 
 @Injectable()
 export class ConferencesService {
@@ -22,6 +23,7 @@ export class ConferencesService {
     private professorsService: ProfessorsService,
     private projectsService: ProjectsService,
     private sessionsService: SessionsService,
+    private mailingService: MailingService,
   ) {}
 
   private async verifyRoomAndDate(
@@ -96,7 +98,15 @@ export class ConferencesService {
       room,
       enterpriseSupervisor: project.enterpriseSupervisor,
     });
-    return await conference.save();
+    const savedConference = await conference.save();
+    if (savedConference) {
+      await this.mailingService.sendEmail(
+        project.student.email,
+        'Project Conference',
+        `Dear ${project.student.name} ${project.student.lastName},\n A conference for your project ${project.title} has been fixated. Please check the platform for more details.`,
+      );
+      return savedConference;
+    }
   }
 
   async getConferencesPerSession(sessionId: string): Promise<Conference[]> {
@@ -151,7 +161,15 @@ export class ConferencesService {
         );
       updates = { ...updates, president };
     }
-    return await oldConference.update(updates, { new: true });
+    const updatedConference = await oldConference.update(updates, { new: true });
+    if (updatedConference) {
+      await this.mailingService.sendEmail(
+        updatedConference.project.student.email,
+        'Project Conference Updated',
+        `Dear ${updatedConference.project.student.name} ${updatedConference.project.student.lastName},\n The conference for your project ${updatedConference.project.title} has been updated. Please check the platform for more details.`,
+      );
+      return updatedConference;
+    }
   }
 
   async deleteConference(conferenceId: string) {
@@ -160,5 +178,12 @@ export class ConferencesService {
     );
     if (!conference)
       throw new NotFoundException(`Conference id ${conferenceId} not found`);
+    else {
+      await this.mailingService.sendEmail(
+        conference.project.student.email,
+        'Project Conference Deleted',
+        `Dear ${conference.project.student.name} ${conference.project.student.lastName},\n The conference for your project ${conference.project.title} has been deleted. Please check the platform for more details.`,
+      );
+    }
   }
 }

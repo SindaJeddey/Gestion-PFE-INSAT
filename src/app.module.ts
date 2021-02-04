@@ -18,6 +18,7 @@ import * as dotenv from 'dotenv';
 import { IdVerificationMiddleware } from './middlewares/id-verification.middleware';
 import { AcademicYearModule } from './academic-year/academic-year.module';
 import { EnterprisesModule } from './enterprises/enterprises.module';
+import { MailingModule } from './mailing/mailing.module';
 
 dotenv.config();
 @Module({
@@ -36,6 +37,7 @@ dotenv.config();
     ConferencesModule,
     AcademicYearModule,
     EnterprisesModule,
+    MailingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

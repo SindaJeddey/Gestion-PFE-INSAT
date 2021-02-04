@@ -9,6 +9,7 @@ import { ProfessorsModule } from '../professors/professors.module';
 import { EnterpriseSchema } from '../enterprises/model/enterprise.model';
 import { EnterprisesModule } from "../enterprises/enterprises.module";
 import { AcademicYearModule } from "../academic-year/academic-year.module";
+import { MailingModule } from "../mailing/mailing.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AcademicYearModule } from "../academic-year/academic-year.module";
     ProfessorsModule,
     EnterprisesModule,
     AcademicYearModule,
+    MailingModule,
   ],
   exports: [ProjectsService],
   providers: [ProjectsService],
