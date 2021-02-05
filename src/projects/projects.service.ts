@@ -154,7 +154,7 @@ export class ProjectsService {
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Validated',
-        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been validated. Please check the updates on the platform.`
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been validated. Please check the platform for more details.`,
       );
     }
   }
@@ -176,7 +176,7 @@ export class ProjectsService {
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Accepted',
-        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been accepted by ${project.supervisor.name} ${project.supervisor.lastName}. Please check the updates on the platform.`,
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been accepted by ${project.supervisor.name} ${project.supervisor.lastName}. Please check the platform for more details..`,
       );
     return updated;
   }
@@ -195,7 +195,7 @@ export class ProjectsService {
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Deleted',
-        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the updates on the platform.`
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the platform for more details.`,
       );
     }
   }
@@ -208,7 +208,7 @@ export class ProjectsService {
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Deleted',
-        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the updates on the platform.`,
+        `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the platform for more details..`,
       );
     }
   }

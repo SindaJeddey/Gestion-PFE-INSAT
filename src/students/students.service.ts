@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Student } from './model/student.model';
 import { UsersService } from '../users/users.service';
 import { NewStudentDto } from './model/dto/new-student.dto';
-import { Roles } from '../users/model/roles';
+import { Role } from '../users/model/role.enum';
 import { UpdatedStudentDto } from './model/dto/updated-student.dto';
 import { MailingService } from '../mailing/mailing.service';
 
@@ -20,14 +20,14 @@ export class StudentsService {
     const student = new this.studentModel(newStudent);
     const savedStudent = await this.userService.newUser({
       email: newStudent.email,
-      role: Roles.STUDENT,
+      role: Role.STUDENT,
     });
     if (savedStudent) return await student.save();
   }
 
-  async getStudent(id: string): Promise<Student> {
-    const student = await this.studentModel.findById(id).exec();
-    if (!student) throw new NotFoundException(`Student id ${id} not found`);
+  async getStudent(studentId: string): Promise<Student> {
+    const student = await this.studentModel.findById(studentId).exec();
+    if (!student) throw new NotFoundException(`Student id ${studentId} not found`);
     return student;
   }
 
@@ -36,16 +36,16 @@ export class StudentsService {
   }
 
   async updateStudent(
-    id: string,
+    studentId: string,
     updates: UpdatedStudentDto,
   ): Promise<Student> {
     const updatedStudent = await this.studentModel.findByIdAndUpdate(
-      id,
+      studentId,
       { ...updates },
       { new: true },
     );
     if (!updatedStudent)
-      throw new NotFoundException(`Student id ${id} not found`);
+      throw new NotFoundException(`Student id ${studentId} not found`);
     else {
       await this.mailingService.sendEmail(
         updatedStudent.email,

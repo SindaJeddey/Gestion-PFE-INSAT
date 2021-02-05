@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Professor } from './model/professor.model';
 import { NewProfessorDto } from './model/dto/new-professor.dto';
 import { UsersService } from '../users/users.service';
-import { Roles } from '../users/model/roles';
+import { Role } from '../users/model/role.enum';
 import { UpdatedProfessorDto } from './model/dto/updated-professor.dto';
 import { MailingService } from '../mailing/mailing.service';
 
@@ -20,7 +20,7 @@ export class ProfessorsService {
     const professor = new this.professorModel(newProfessor);
     const savedUser = this.userService.newUser({
       email: newProfessor.email,
-      role: Roles.PROFESSOR,
+      role: Role.PROFESSOR,
     });
     if (savedUser) return await professor.save();
   }
@@ -55,5 +55,11 @@ export class ProfessorsService {
       );
       return professor;
     }
+  }
+
+  async deleteProfessor(professorId: string) {
+    const professor = await this.professorModel.findByIdAndDelete(professorId);
+    if (!professor)
+      throw new NotFoundException(`Professor ${professorId} not found`);
   }
 }

@@ -103,7 +103,7 @@ export class ConferencesService {
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Conference',
-        `Dear ${project.student.name} ${project.student.lastName},\n A conference for your project ${project.title} has been fixated. Please check the platform for more details.`,
+        `Dear ${project.student.name} ${project.student.lastName},\n A conference for your project "${project.title}" has been fixated. Please check the platform for more details.`,
       );
       return savedConference;
     }
@@ -111,7 +111,10 @@ export class ConferencesService {
 
   async getConferencesPerSession(sessionId: string): Promise<Conference[]> {
     const session = await this.sessionsService.getSession(sessionId);
-    return await this.conferenceModel.find({ session }).exec();
+    return await this.conferenceModel
+      .find({ session })
+      .populate('president student project supervisor inspector')
+      .exec(); // populate the whole session
   }
 
   async updateConference(
@@ -166,7 +169,7 @@ export class ConferencesService {
       await this.mailingService.sendEmail(
         updatedConference.project.student.email,
         'Project Conference Updated',
-        `Dear ${updatedConference.project.student.name} ${updatedConference.project.student.lastName},\n The conference for your project ${updatedConference.project.title} has been updated. Please check the platform for more details.`,
+        `Dear ${updatedConference.project.student.name} ${updatedConference.project.student.lastName},\n The conference for your project "${updatedConference.project.title}" has been updated. Please check the platform for more details.`,
       );
       return updatedConference;
     }
@@ -182,8 +185,11 @@ export class ConferencesService {
       await this.mailingService.sendEmail(
         conference.project.student.email,
         'Project Conference Deleted',
-        `Dear ${conference.project.student.name} ${conference.project.student.lastName},\n The conference for your project ${conference.project.title} has been deleted. Please check the platform for more details.`,
+        `Dear ${conference.project.student.name} ${conference.project.student.lastName},\n The conference for your project "${conference.project.title}" has been deleted. Please check the platform for more details.`,
       );
     }
   }
+
+  //get professor current year conferences : conferences + role prof dans le jury en français
+
 }

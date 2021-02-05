@@ -4,6 +4,9 @@ import { NewStudentDto } from './model/dto/new-student.dto';
 import { Student } from './model/student.model';
 import { UpdatedStudentDto } from './model/dto/updated-student.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../decorators/role.decorator';
+import { Role } from '../users/model/role.enum';
+import { User } from '../decorators/user.decorator';
 
 @ApiTags('Students')
 @Controller('students')
@@ -11,21 +14,28 @@ export class StudentsController {
   constructor(private studentsService: StudentsService) {}
 
   @Post()
-  @ApiOperation({ description: 'Adding a student by the admin.' })
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Adding a student.' })
   @ApiResponse({ status: 201, description: 'Student successfully added.' })
-  async addStudent(@Body() newStudent: NewStudentDto): Promise<Student> {
+  async addStudent(
+    @User() user,
+    @Body() newStudent: NewStudentDto,
+  ): Promise<Student> {
+    console.log(user);
     return await this.studentsService.addStudent(newStudent);
   }
 
   @Get(':id')
+  @Roles(Role.STUDENT, Role.ADMIN)
   @ApiOperation({ description: 'Retrieving a student.' })
   @ApiResponse({ status: 201, description: 'Student successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
-  async getStudent(@Param('id') id: string): Promise<Student> {
-    return await this.studentsService.getStudent(id);
+  async getStudent(@Param('id') studentId: string): Promise<Student> {
+    return await this.studentsService.getStudent(studentId);
   }
 
   @Get()
+  @Roles(Role.STUDENT, Role.ADMIN)
   @ApiOperation({ description: 'Retrieving all students.' })
   @ApiResponse({ status: 201, description: 'Students successfully retrieved.' })
   async getStudents(): Promise<Student[]> {
@@ -33,13 +43,14 @@ export class StudentsController {
   }
 
   @Put(':id')
-  @ApiOperation({ description: 'Updating a student by the admin.' })
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Updating a student' })
   @ApiResponse({ status: 201, description: 'Student successfully updated.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   async updateStudent(
-    @Param('id') id: string,
+    @Param('id') studentId: string,
     @Body() updates: UpdatedStudentDto,
   ): Promise<Student> {
-    return await this.studentsService.updateStudent(id, updates);
+    return await this.studentsService.updateStudent(studentId, updates);
   }
 }

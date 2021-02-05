@@ -25,7 +25,7 @@ export class AuthenticationService {
       if (hashedEnteredPassword !== user.password)
         throw new NotFoundException('Wrong Password');
       else {
-        const payload = { email: user.email, role: user.role };
+        const payload = { email: user.email, role: user.role, id: user._id };
         return { 'access-token': this.jwtService.sign(payload) };
       }
     }
