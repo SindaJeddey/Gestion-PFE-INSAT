@@ -22,4 +22,6 @@ export class UsersController {
   ) {
     await this.usersService.changePassword(user.email, updatedUserPassword);
   }
+
+
 }

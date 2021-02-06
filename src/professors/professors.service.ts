@@ -25,10 +25,17 @@ export class ProfessorsService {
     if (savedUser) return await professor.save();
   }
 
-  async getProfessor(professorId: string): Promise<Professor> {
+  async getProfessorById(professorId: string): Promise<Professor> {
     const professor = await this.professorModel.findById(professorId);
     if (!professor)
       throw new NotFoundException(`Professor ${professorId} not found`);
+    return professor;
+  }
+
+  async getProfessorByEmail(professorEmail: string): Promise<Professor> {
+    const professor = await this.professorModel.findById(professorEmail);
+    if (!professor)
+      throw new NotFoundException(`Professor ${professorEmail} not found`);
     return professor;
   }
 
@@ -62,4 +69,9 @@ export class ProfessorsService {
     if (!professor)
       throw new NotFoundException(`Professor ${professorId} not found`);
   }
+
+  //fetch projects to be accepted by professors
+  //fetch projects to be validated by admin
+
+
 }

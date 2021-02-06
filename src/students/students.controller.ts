@@ -7,7 +7,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
-import { RolesGuard } from "../authentication/guards/roles.guard";
 
 @ApiTags('Students')
 @Controller('students')
@@ -26,13 +25,22 @@ export class StudentsController {
     return await this.studentsService.addStudent(newStudent);
   }
 
-  @Get(':id')
-  @Roles(Role.STUDENT, Role.ADMIN)
+  @Get('profile')
+  @Roles(Role.STUDENT)
   @ApiOperation({ description: 'Retrieving a student.' })
   @ApiResponse({ status: 201, description: 'Student successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
-  async getStudent(@Param('id') studentId: string): Promise<Student> {
-    return await this.studentsService.getStudent(studentId);
+  async getStudentProfile(@User() student): Promise<Student> {
+    return await this.studentsService.getStudentByEmail(student.email);
+  }
+
+  @Get(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Retrieving a student.' })
+  @ApiResponse({ status: 201, description: 'Student successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Student not found.' })
+  async getStudent(@Param('id') studentId: string, @User() user): Promise<Student> {
+    return await this.studentsService.getStudentById(studentId);
   }
 
   @Get()

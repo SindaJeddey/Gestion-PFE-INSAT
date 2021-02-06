@@ -13,8 +13,11 @@ export class AcademicYearService {
   async createNewAcademicYear(
     newYear: NewAcademicYearDto,
   ): Promise<AcademicYear> {
-    if (await this.getCurrentAcademicYear())
-      throw new BadRequestException('An academic year is already happening');
+    try {
+      if (await this.getCurrentAcademicYear())
+        throw new BadRequestException('An academic year is already happening');
+    } catch (e) {}
+
     if (
       newYear.endYear < newYear.startYear ||
       newYear.endYear - newYear.startYear !== 1
@@ -24,6 +27,7 @@ export class AcademicYearService {
       startDate: new Date(newYear.startYear, 9, 1),
       endDate: new Date(newYear.endYear, 8, 31),
     });
+    console.log(academicYear);
     return await academicYear.save();
   }
 

@@ -37,7 +37,7 @@ export class ProjectsController {
     @Body() newProject: NewProjectDto,
     @User() user,
   ): Promise<Project> {
-    if (user.id !== newProject.student)
+    if (user.email !== newProject.student)
       throw new UnauthorizedException(
         "Can't create a project for a different user",
       );
@@ -53,7 +53,7 @@ export class ProjectsController {
     description: 'Project not found or Student not found.',
   })
   async getStudentCurrentProject(@User() student): Promise<Project> {
-    return await this.projectsService.getStudentCurrentProject(student.id);
+    return await this.projectsService.getStudentCurrentProject(student.email);
   }
 
   @Put()
@@ -70,11 +70,11 @@ export class ProjectsController {
     @User() student,
     @Body() updates: UpdatedProjectDto,
   ): Promise<Project> {
-    return await this.projectsService.updateProject(student.id, updates);
+    return await this.projectsService.updateProject(student.email, updates);
   }
 
-  @Get('professor/:id')
-  @Roles(Role.ADMIN, Role.PROFESSOR)
+  @Get('professor')
+  @Roles(Role.PROFESSOR)
   @ApiOperation({
     description: 'Retrieving projects supervised by a professor',
   })
@@ -87,12 +87,12 @@ export class ProjectsController {
       'Filter projects to retrieve: all, old or currently supervised by given professor',
   })
   async getProfessorSupervisedProjects(
-    @Param('id') professorId: string,
+    @User() professor,
     @Query('filter') state: string,
   ): Promise<Project[]> {
     if (['current', 'old', 'all'].indexOf(state) > -1)
       return await this.projectsService.getProfessorSupervisedProjects(
-        professorId,
+        professor.email,
         state,
       );
     else throw new BadRequestException('Invalid request');
@@ -115,8 +115,11 @@ export class ProjectsController {
   @ApiOperation({ description: 'Validating a project by the supervisor.' })
   @ApiResponse({ status: 201, description: 'Project successfully accepted.' })
   @ApiResponse({ status: 404, description: 'Project not found .' })
-  async acceptProjectBySupervisor(@Param('id') projectId: string, @User() professor) {
-    await this.projectsService.acceptProject(professor.id, projectId);
+  async acceptProjectBySupervisor(
+    @Param('id') projectId: string,
+    @User() professor,
+  ) {
+    await this.projectsService.acceptProject(professor.email, projectId);
   }
 
   @Delete()
@@ -125,7 +128,7 @@ export class ProjectsController {
   @ApiResponse({ status: 201, description: 'Project successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })
   async deleteProjectByStudent(@User() student) {
-    await this.projectsService.deleteProjectByStudent(student.id);
+    await this.projectsService.deleteProjectByStudent(student.email);
   }
 
   @Delete(':id')

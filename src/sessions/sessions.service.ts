@@ -16,7 +16,7 @@ export class SessionsService {
   ) {}
 
   async createNewSession(newSession: NewSessionDto): Promise<Session> {
-    const president = await this.professorsService.getProfessor(
+    const president = await this.professorsService.getProfessorById(
       newSession.president,
     );
     const academicYear = await this.academicYearService.getCurrentAcademicYear();
@@ -51,7 +51,7 @@ export class SessionsService {
     updates: UpdatedSessionDto,
   ): Promise<Session> {
     if (updates.president !== undefined) {
-      const president = await this.professorsService.getProfessor(
+      const president = await this.professorsService.getProfessorById(
         updates.president,
       );
       updates.president = president;

@@ -5,7 +5,9 @@ import * as mongoose from 'mongoose';
 @Injectable()
 export class IdVerificationMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
-    if (
+    if (req.params.id === 'profile')
+      next()
+    else if (
       !mongoose.Types.ObjectId.isValid(req.params.id) ||
       !/^[a-fA-F0-9]{24}$/.test(req.params.id)
     )

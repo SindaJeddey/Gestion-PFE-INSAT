@@ -7,6 +7,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 import { User } from "../decorators/user.decorator";
+import { Student } from "../students/model/student.model";
 
 @ApiTags('Professors')
 @Controller('professors')
@@ -25,12 +26,12 @@ export class ProfessorsController {
   }
 
   @Get('/:id')
-  @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
+  @Roles(Role.ADMIN, Role.STUDENT)
   @ApiOperation({ description: 'Getting a professor.' })
   @ApiResponse({ status: 201, description: 'Professor successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Professor not found.' })
   async getProfessor(@Param('id') professorId: string): Promise<Professor> {
-    return await this.professorsService.getProfessor(professorId);
+    return await this.professorsService.getProfessorById(professorId);
   }
 
   @Get()
@@ -39,6 +40,15 @@ export class ProfessorsController {
   @ApiResponse({ status: 201, description: 'Professors successfully retrieved.' })
   async getProfessors(): Promise<Professor[]> {
     return await this.professorsService.getAllProfessors();
+  }
+
+  @Get('profile')
+  @Roles(Role.PROFESSOR)
+  @ApiOperation({ description: 'Retrieving a professor profile.' })
+  @ApiResponse({ status: 201, description: 'Professor successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Professor not found.' })
+  async getStudentProfile(@User() professor): Promise<Professor> {
+    return await this.professorsService.getProfessorByEmail(professor.email);
   }
 
   @Put(':id')
@@ -51,8 +61,11 @@ export class ProfessorsController {
     @Param('id') professorId: string,
     @Body() updates: UpdatedProfessorDto,
   ): Promise<Professor> {
+    // refactor parts like this one because user.id is not the same as professor.id or other, tu vois ?
     if (user.role === Role.PROFESSOR && user.id != professorId)
-      throw new UnauthorizedException(`Can't update professor id ${professorId}`)
+      throw new UnauthorizedException(
+        `Can't update professor id ${professorId}`,
+      );
     return await this.professorsService.updateProfessor(professorId, updates);
   }
 

@@ -44,7 +44,9 @@ export class ConferencesService {
     professorId: string,
     date: Date,
   ): Promise<Professor> {
-    const professor = await this.professorsService.getProfessor(professorId);
+    const professor = await this.professorsService.getProfessorById(
+      professorId,
+    );
     const conference = await this.conferenceModel.findOne({
       date,
       $or: [
@@ -141,7 +143,7 @@ export class ConferencesService {
     if (updates.inspector) {
       let inspector;
       if (updates.inspector === oldConference.president._id.toString())
-        inspector = await this.professorsService.getProfessor(
+        inspector = await this.professorsService.getProfessorById(
           updates.inspector,
         );
       else
@@ -154,7 +156,7 @@ export class ConferencesService {
     if (updates.president) {
       let president;
       if (updates.president === oldConference.inspector._id.toString())
-        president = await this.professorsService.getProfessor(
+        president = await this.professorsService.getProfessorById(
           updates.president,
         );
       else
@@ -164,7 +166,9 @@ export class ConferencesService {
         );
       updates = { ...updates, president };
     }
-    const updatedConference = await oldConference.update(updates, { new: true });
+    const updatedConference = await oldConference.update(updates, {
+      new: true,
+    });
     if (updatedConference) {
       await this.mailingService.sendEmail(
         updatedConference.project.student.email,

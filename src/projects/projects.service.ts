@@ -26,7 +26,9 @@ export class ProjectsService {
   ) {}
 
   async addProject(newProject: NewProjectDto): Promise<Project> {
-    const student = await this.studentsService.getStudent(newProject.student);
+    const student = await this.studentsService.getStudentByEmail(
+      newProject.student,
+    );
 
     const projects = await this.projectModel.find({ student: student }).exec();
     if (projects.length === 3) {
@@ -42,7 +44,7 @@ export class ProjectsService {
           `Student id ${newProject.student} already has a project for his level`,
         );
     }
-    const supervisor = await this.professorsService.getProfessor(
+    const supervisor = await this.professorsService.getProfessorByEmail(
       newProject.supervisor,
     );
     let enterprise;
@@ -91,23 +93,25 @@ export class ProjectsService {
     else return project;
   }
 
-  async getStudentCurrentProject(studentId: string): Promise<Project> {
-    const student = await this.studentsService.getStudent(studentId);
+  async getStudentCurrentProject(studentEmail: string): Promise<Project> {
+    const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel
       .findOne({ student: student, level: student.level })
       .exec();
     if (!project)
       throw new NotFoundException(
-        `Student id ${studentId} doesn't have a project yet`,
+        `Student ${studentEmail} doesn't have a project yet`,
       );
     return project;
   }
 
   async getProfessorSupervisedProjects(
-    professorId: string,
+    professorEmail: string,
     state: string,
   ): Promise<Project[]> {
-    const supervisor = await this.professorsService.getProfessor(professorId);
+    const supervisor = await this.professorsService.getProfessorByEmail(
+      professorEmail,
+    );
     let filter;
     if (state !== 'all') {
       const academicYear = await this.academicYearService.getCurrentAcademicYear();
@@ -118,10 +122,10 @@ export class ProjectsService {
   }
 
   async updateProject(
-    studentId: string,
+    studentEmail: string,
     updates: UpdatedProjectDto,
   ): Promise<Project> {
-    const student = await this.studentsService.getStudent(studentId);
+    const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel.findOneAndUpdate(
       { student },
       { ...updates },
@@ -129,7 +133,7 @@ export class ProjectsService {
     );
     if (!project)
       throw new NotFoundException(
-        `Project for Student id ${studentId} Not Found`,
+        `Project for Student ${studentEmail} Not Found`,
       );
     await this.mailingService.sendEmail(
       student.email,
@@ -161,17 +165,20 @@ export class ProjectsService {
 
   //By Professor
   async acceptProject(
-    professorId: string,
+    professorEmail: string,
     projectId: string,
   ): Promise<Project> {
     const project = await this.projectModel.findById(projectId);
     if (!project) throw new NotFoundException(`Project ${projectId} Not Found`);
-    if (project.supervisor._id.toString() !== professorId)
+    if (project.supervisor.email !== professorEmail)
       throw new ConflictException(
-        `Project ${projectId} doesn't correspond to supervisor ${professorId}`,
+        `Project ${projectId} doesn't correspond to supervisor ${professorEmail}`,
       );
 
-    const updated = await project.update({ acceptedBySupervisor: true }, {new: true});
+    const updated = await project.update(
+      { acceptedBySupervisor: true },
+      { new: true },
+    );
     if (updated)
       await this.mailingService.sendEmail(
         project.student.email,
@@ -181,15 +188,15 @@ export class ProjectsService {
     return updated;
   }
 
-  async deleteProjectByStudent(studentId: string) {
-    const student = await this.studentsService.getStudent(studentId);
+  async deleteProjectByStudent(studentEmail: string) {
+    const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel.findOneAndDelete({
       student,
       level: student.level,
     });
     if (!project)
       throw new NotFoundException(
-        `Project for student id ${studentId} Not Found`,
+        `Project for student ${studentEmail} Not Found`,
       );
     else {
       await this.mailingService.sendEmail(

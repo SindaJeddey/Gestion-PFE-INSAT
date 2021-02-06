@@ -25,9 +25,18 @@ export class StudentsService {
     if (savedStudent) return await student.save();
   }
 
-  async getStudent(studentId: string): Promise<Student> {
+  async getStudentByEmail(studentEmail: string): Promise<Student> {
+    const student = await this.studentModel
+      .findOne({ email: studentEmail })
+      .exec();
+    if (!student)
+      throw new NotFoundException(`Student ${studentEmail} not found`);
+    return student;
+  }
+
+  async getStudentById(studentId: string): Promise<Student> {
     const student = await this.studentModel.findById(studentId).exec();
-    if (!student) throw new NotFoundException(`Student id ${studentId} not found`);
+    if (!student) throw new NotFoundException(`Student ${studentId} not found`);
     return student;
   }
 

@@ -48,6 +48,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer
       .apply(IdVerificationMiddleware)
+      .exclude({ path: '*/profile', method: RequestMethod.GET })
       .forRoutes(
         { path: '*/:id', method: RequestMethod.GET },
         { path: '*/:id', method: RequestMethod.PUT },

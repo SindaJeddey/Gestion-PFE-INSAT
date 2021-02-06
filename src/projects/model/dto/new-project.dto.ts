@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IS_EMAIL, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
 import { EnterpriseDto } from '../../../enterprises/model/dto/enterprise.dto';
 
@@ -13,14 +13,14 @@ export class NewProjectDto {
   @ApiProperty({ type: String, required: true })
   description: string;
 
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, description: 'Supervisor ID' })
+  @ApiProperty({ type: String, required: true, description: 'Supervisor email' })
   supervisor: string;
 
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, description: 'Student ID' })
+  @ApiProperty({ type: String, required: true, description: 'Student email' })
   student: string;
 
   @IsOptional()
