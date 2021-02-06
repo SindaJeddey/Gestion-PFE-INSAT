@@ -1,12 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { StudentsService } from './students.service';
 import { NewStudentDto } from './model/dto/new-student.dto';
 import { Student } from './model/student.model';
 import { UpdatedStudentDto } from './model/dto/updated-student.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../decorators/role.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
+import { RolesGuard } from "../authentication/guards/roles.guard";
 
 @ApiTags('Students')
 @Controller('students')
@@ -35,7 +36,7 @@ export class StudentsController {
   }
 
   @Get()
-  @Roles(Role.STUDENT, Role.ADMIN)
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Retrieving all students.' })
   @ApiResponse({ status: 201, description: 'Students successfully retrieved.' })
   async getStudents(): Promise<Student[]> {

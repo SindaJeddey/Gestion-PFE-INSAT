@@ -2,7 +2,7 @@ import { Controller, Get } from "@nestjs/common";
 import { EnterprisesService } from "./enterprises.service";
 import { Enterprise } from "./model/enterprise.model";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/role.decorator";
+import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 
 @ApiTags('Enterprise')

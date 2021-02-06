@@ -14,7 +14,7 @@ import { NewProjectDto } from './model/dto/new-project.dto';
 import { Project } from './model/project.model';
 import { UpdatedProjectDto } from './model/dto/updated-project.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../decorators/role.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
 

@@ -2,7 +2,7 @@ import { Body, Controller, Put } from "@nestjs/common";
 import { UpdatedUserDto } from "./model/dto/updated-user.dto";
 import { UsersService } from "./users.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/role.decorator";
+import { Roles } from "../decorators/roles.decorator";
 import { Role } from "./model/role.enum";
 import { User } from "../decorators/user.decorator";
 

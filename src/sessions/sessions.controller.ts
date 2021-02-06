@@ -12,7 +12,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NewSessionDto } from './model/dto/new-session.dto';
 import { Session } from './model/session.model';
 import { UpdatedSessionDto } from './model/dto/updated-session.dto';
-import { Roles } from '../decorators/role.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
 

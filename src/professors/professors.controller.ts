@@ -4,7 +4,7 @@ import { Professor } from "./model/professor.model";
 import { ProfessorsService } from "./professors.service";
 import { UpdatedProfessorDto } from "./model/dto/updated-professor.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/role.decorator";
+import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 import { User } from "../decorators/user.decorator";
 

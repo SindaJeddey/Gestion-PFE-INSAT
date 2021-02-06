@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userService.findOne(payload.email);
     if (user) {
       const { email, role } = user;
+      console.log({ email, role });
       return { email, role };
     } else throw new UnauthorizedException();
   }

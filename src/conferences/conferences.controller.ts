@@ -4,7 +4,7 @@ import { NewConferenceDto } from "./model/dto/new-conference.dto";
 import { Conference } from "./model/conference.model";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UpdateConferenceDto } from "./model/dto/update-conference.dto";
-import { Roles } from "../decorators/role.decorator";
+import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 
 @Controller('conferences')

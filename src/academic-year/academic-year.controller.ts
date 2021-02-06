@@ -3,7 +3,7 @@ import { AcademicYearService } from "./academic-year.service";
 import { AcademicYear } from "./model/academic-year.model";
 import { NewAcademicYearDto } from "./model/dto/new-academic-year.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/role.decorator";
+import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 
 @Controller('academic-year')
