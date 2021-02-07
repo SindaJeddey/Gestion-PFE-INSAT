@@ -11,6 +11,7 @@ import { SessionDto } from "./model/dto/session.dto";
 import { State } from "../projects/model/state.enum";
 import { UpdatedProjectDto } from "../projects/model/dto/updated-project.dto";
 import { MailingService } from "../mailing/mailing.service";
+import { Project } from "../projects/model/project.model";
 
 @Injectable()
 export class SessionsService {
@@ -105,10 +106,8 @@ export class SessionsService {
     }
   }
 
-  async confirmProject(studentEmail: string) {
-    const project = await this.projectsService.getStudentCurrentProject(
-      studentEmail,
-    );
+  async confirmProject(projectId: string) {
+    const project = await this.projectsService.getProject(projectId);
     if (project.state === State.NONE || !project.session)
       throw new BadRequestException(
         `Project ${project._id} is not even pending`,
@@ -118,27 +117,21 @@ export class SessionsService {
       const updates = new UpdatedProjectDto();
       if (session.conferences.length < session.capacity) {
         updates.state = State.CONFIRMED;
-        const updatedProject = await this.projectsService.updateProject(
-          studentEmail,
-          updates,
-        );
+        const updatedProject = await project.update({ ...updates }).exec();
         if (updatedProject)
           await this.mailingService.sendEmail(
-            updatedProject.student.email,
+            project.student.email,
             'Project Confirmed For Session',
-            `Dear ${updatedProject.student.name} ${updatedProject.student.lastName},\n Your project "${updatedProject.title}" is now confirmed for demanded session. Please check the platform for more details.`,
+            `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" is now confirmed for demanded session. Please check the platform for more details.`,
           );
       } else {
         updates.session = null;
-        const updatedProject = await this.projectsService.updateProject(
-          studentEmail,
-          updates,
-        );
+        const updatedProject = await project.update({ ...updates }).exec();
         if (updatedProject)
           await this.mailingService.sendEmail(
-            updatedProject.student.email,
+            project.student.email,
             'Project Not Confirmed For Session',
-            `Dear ${updatedProject.student.name} ${updatedProject.student.lastName},\n The session you demanded has reached its maximum capacity.\nMake sure to reserve for the next session. Please check the platform for more details.`,
+            `Dear ${project.student.name} ${project.student.lastName},\n The session you demanded has reached its maximum capacity.\nMake sure to reserve for the next session. Please check the platform for more details.`,
           );
       }
     }

@@ -10,15 +10,15 @@ import {
 import { ConferencesService } from './conferences.service';
 import { NewConferenceDto } from './model/dto/new-conference.dto';
 import { Conference } from './model/conference.model';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UpdateConferenceDto } from './model/dto/update-conference.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
-import { Public } from '../decorators/public.decorator';
 
 @Controller('conferences')
 @ApiTags('Conferences')
+@ApiBearerAuth()
 export class ConferencesController {
   constructor(private conferencesService: ConferencesService) {}
 
@@ -30,17 +30,14 @@ export class ConferencesController {
     description: 'Conferences successfully retrieved.',
   })
   @ApiResponse({ status: 404, description: 'Professor not found.' })
-  async getProfessorConferences(
-    @User() professor,
-  ): Promise<Conference[]> {
+  async getProfessorConferences(@User() professor): Promise<Conference[]> {
     return await this.conferencesService.getProfessorConference(
       professor.email,
     );
   }
 
   @Get('session/:id')
-  // @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
-  @Public()
+  @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
   @ApiOperation({ description: 'Retrieving conferences of a given session.' })
   @ApiResponse({
     status: 200,
@@ -57,8 +54,7 @@ export class ConferencesController {
   }
 
   @Post()
-  // @Roles(Role.ADMIN)
-  @Public()
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Creating a conference.' })
   @ApiResponse({ status: 201, description: 'Conference successfully created.' })
   async createConference(
@@ -68,8 +64,7 @@ export class ConferencesController {
   }
 
   @Put(':id')
-  // @Roles(Role.ADMIN)
-  @Public()
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Updating a conference.' })
   @ApiResponse({ status: 200, description: 'Conference successfully updated.' })
   @ApiResponse({ status: 404, description: 'Conference not found.' })
@@ -80,7 +75,7 @@ export class ConferencesController {
   async updateConference(
     @Param('id') conferenceId: string,
     @Body() updates: UpdateConferenceDto,
-  ){
+  ) {
     await this.conferencesService.updateConference(conferenceId, updates);
   }
 

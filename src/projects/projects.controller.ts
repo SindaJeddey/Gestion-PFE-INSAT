@@ -8,17 +8,16 @@ import {
   Post,
   Put,
   Query,
-  UnauthorizedException
-} from "@nestjs/common";
-import { ProjectsService } from "./projects.service";
-import { NewProjectDto } from "./model/dto/new-project.dto";
-import { Project } from "./model/project.model";
-import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from "../decorators/roles.decorator";
-import { Role } from "../users/model/role.enum";
-import { User } from "../decorators/user.decorator";
-import { Public } from "../decorators/public.decorator";
+} from '@nestjs/common';
+import { ProjectsService } from './projects.service';
+import { NewProjectDto } from './model/dto/new-project.dto';
+import { Project } from './model/project.model';
+import { UpdatedProjectDto } from './model/dto/updated-project.dto';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Roles } from '../decorators/roles.decorator';
+import { Role } from '../users/model/role.enum';
+import { User } from '../decorators/user.decorator';
+import { Public } from '../decorators/public.decorator';
 
 enum SupervisedProjects {
   CURRENT = 'current',
@@ -26,13 +25,13 @@ enum SupervisedProjects {
 }
 
 @ApiTags('Projects')
+@ApiBearerAuth()
 @Controller('projects')
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
   @Get('professor')
-  // @Roles(Role.PROFESSOR)
-  @Public()
+  @Roles(Role.PROFESSOR)
   @ApiOperation({
     description: 'Retrieving projects supervised by a professor',
   })
@@ -58,7 +57,6 @@ export class ProjectsController {
 
   @Get('to-accept')
   @Roles(Role.PROFESSOR)
-  // @Public()
   @ApiOperation({
     description: 'Retrieving projects to be accepted by supervisor',
   })
@@ -71,8 +69,7 @@ export class ProjectsController {
   }
 
   @Get('to-validate')
-  // @Roles(Role.ADMIN)
-  @Public()
+  @Roles(Role.ADMIN)
   @ApiOperation({
     description: 'Retrieving projects to be validated by admin',
   })
@@ -81,9 +78,16 @@ export class ProjectsController {
     return await this.projectsService.getProjectsToBeValidatedByAdmin();
   }
 
-  @Get()
-  // @Roles(Role.STUDENT)
+  @Get('session/:id')
   @Public()
+  async getProjectsPerSession(
+    @Param('id') sessionId: string,
+  ): Promise<Project[]> {
+    return await this.projectsService.getProjectsPerSession(sessionId);
+  }
+
+  @Get()
+  @Roles(Role.STUDENT)
   @ApiOperation({ description: 'Retrieving a project by the student.' })
   @ApiResponse({ status: 200, description: 'Project successfully retrieved.' })
   @ApiResponse({
@@ -96,24 +100,15 @@ export class ProjectsController {
 
   @Post()
   @Roles(Role.STUDENT)
-  // @Public()
   @ApiOperation({ description: 'Adding a project.' })
   @ApiResponse({ status: 201, description: 'Project successfully added.' })
   @ApiResponse({ status: 409, description: 'Student already has a project.' })
-  async addProject(
-    @Body() newProject: NewProjectDto,
-    @User() user,
-  ): Promise<Project> {
-    if (user.email !== newProject.student)
-      throw new UnauthorizedException(
-        "Can't create a project for a different user",
-      );
+  async addProject(@Body() newProject: NewProjectDto): Promise<Project> {
     return await this.projectsService.addProject(newProject);
   }
 
   @Put('validate/:id')
-  // @Roles(Role.ADMIN)
-  @Public()
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Validating a project by the admin.' })
   @ApiResponse({ status: 201, description: 'Project successfully validated.' })
   @ApiResponse({
@@ -126,7 +121,6 @@ export class ProjectsController {
 
   @Put('accept/:id')
   @Roles(Role.PROFESSOR)
-  // @Public()
   @ApiOperation({ description: 'Validating a project by the supervisor.' })
   @ApiResponse({ status: 201, description: 'Project successfully accepted.' })
   @ApiResponse({ status: 404, description: 'Project not found .' })
@@ -139,7 +133,6 @@ export class ProjectsController {
 
   @Put()
   @Roles(Role.STUDENT)
-  // @Public()
   @ApiOperation({
     description: 'Updating a project by the student.',
   })
@@ -156,8 +149,7 @@ export class ProjectsController {
   }
 
   @Delete(':id')
-  // @Roles(Role.ADMIN)
-  @Public()
+  @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Deleting a project by the admin.' })
   @ApiResponse({ status: 204, description: 'Project successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })
@@ -166,8 +158,7 @@ export class ProjectsController {
   }
 
   @Delete()
-  // @Roles(Role.STUDENT)
-  @Public()
+  @Roles(Role.STUDENT)
   @ApiOperation({ description: 'Deleting a project by the student.' })
   @ApiResponse({ status: 204, description: 'Project successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })

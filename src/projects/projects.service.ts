@@ -1,19 +1,14 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException
-} from "@nestjs/common";
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Project } from './model/project.model';
-import { NewProjectDto } from './model/dto/new-project.dto';
-import { StudentsService } from '../students/students.service';
-import { ProfessorsService } from '../professors/professors.service';
-import { UpdatedProjectDto } from './model/dto/updated-project.dto';
-import { EnterprisesService } from '../enterprises/enterprises.service';
-import { AcademicYearService } from '../academic-year/academic-year.service';
-import { MailingService } from '../mailing/mailing.service';
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Project } from "./model/project.model";
+import { NewProjectDto } from "./model/dto/new-project.dto";
+import { StudentsService } from "../students/students.service";
+import { ProfessorsService } from "../professors/professors.service";
+import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
+import { EnterprisesService } from "../enterprises/enterprises.service";
+import { AcademicYearService } from "../academic-year/academic-year.service";
+import { MailingService } from "../mailing/mailing.service";
 import { State } from "./model/state.enum";
 
 @Injectable()
@@ -248,5 +243,12 @@ export class ProjectsService {
 
   async getProjectsToBeValidatedByAdmin(): Promise<Project[]> {
     return await this.projectModel.find({ validity: false }).exec();
+  }
+
+  async getProjectsPerSession(sessionId: string): Promise<Project[]> {
+    return await this.projectModel
+      .find()
+      .populate({ path: 'session', match: { _id: sessionId } })
+      .exec();
   }
 }

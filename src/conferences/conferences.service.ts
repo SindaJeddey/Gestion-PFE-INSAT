@@ -60,7 +60,7 @@ export class ConferencesService {
     const project = await this.projectsService.getProject(projectId);
     if (!project.validity)
       throw new BadRequestException(`Project ${projectId} not validated yet`);
-    if (project.state !== State.CONFIRMED)
+    if (project.state !== State.CONFIRMED && project.state !== State.PROGRAMMED)
       throw new BadRequestException(
         `Project ${projectId} not confirmed for yet`,
       );
@@ -97,28 +97,30 @@ export class ConferencesService {
       president._id.toString() === inspector._id.toString()
     )
       throw new BadRequestException('Invalid Jury');
-    console.log(project);
-    const conference = new this.conferenceModel({
-      date,
-      session,
-      president,
-      inspector,
-      supervisor,
-      project,
-      room,
-      enterpriseSupervisor: project.enterpriseSupervisor,
-    });
-    const savedConference = await conference.save();
-    if (savedConference) {
-      session.conferences.push(savedConference);
-      await session.save();
-      await this.mailingService.sendEmail(
-        project.student.email,
-        'Project Conference',
-        `Dear ${project.student.name} ${project.student.lastName},\n A conference for your project "${project.title}" has been fixated. Please check the platform for more details.`,
-      );
-      return savedConference;
-    }
+    try {
+      const conference = new this.conferenceModel({
+        date,
+        session,
+        president,
+        inspector,
+        supervisor,
+        project,
+        room,
+        enterpriseSupervisor: project.enterpriseSupervisor
+      });
+      const savedConference = await conference.save();
+      if (savedConference) {
+        session.conferences.push(savedConference);
+        await session.save();
+        await project.update({ state: State.PROGRAMMED });
+        await this.mailingService.sendEmail(
+          project.student.email,
+          'Project Conference',
+          `Dear ${project.student.name} ${project.student.lastName},\n A conference for your project "${project.title}" has been fixated. Please check the platform for more details.`
+        );
+        return savedConference;
+      }
+    } catch (e) {}
   }
 
   async getConferencesPerSession(sessionId: string): Promise<Conference[]> {
@@ -189,8 +191,9 @@ export class ConferencesService {
   }
 
   async deleteConference(conferenceId: string) {
-    const conference = await this.conferenceModel
-      .findByIdAndDelete(conferenceId);
+    const conference = await this.conferenceModel.findByIdAndDelete(
+      conferenceId,
+    );
     if (!conference)
       throw new NotFoundException(`Conference id ${conferenceId} not found`);
     else {
