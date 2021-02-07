@@ -1,23 +1,12 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import { ProjectsService } from './projects.service';
-import { NewProjectDto } from './model/dto/new-project.dto';
-import { Project } from './model/project.model';
-import { UpdatedProjectDto } from './model/dto/updated-project.dto';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { ProjectsService } from "./projects.service";
+import { NewProjectDto } from "./model/dto/new-project.dto";
+import { Project } from "./model/project.model";
+import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Roles } from '../decorators/roles.decorator';
-import { Role } from '../users/model/role.enum';
-import { User } from '../decorators/user.decorator';
-import { Public } from '../decorators/public.decorator';
+import { Roles } from "../decorators/roles.decorator";
+import { Role } from "../users/model/role.enum";
+import { User } from "../decorators/user.decorator";
 
 enum SupervisedProjects {
   CURRENT = 'current',
@@ -79,7 +68,10 @@ export class ProjectsController {
   }
 
   @Get('session/:id')
-  @Public()
+  @ApiOperation({
+    description: 'Retrieving projects of a given session',
+  })
+  @Roles(Role.ADMIN)
   async getProjectsPerSession(
     @Param('id') sessionId: string,
   ): Promise<Project[]> {
