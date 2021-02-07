@@ -34,7 +34,7 @@ export class SessionsController {
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.PROFESSOR, Role.STUDENT)
   @ApiOperation({ description: 'Get current academic year sessions.' })
   @ApiResponse({ status: 200, description: 'Sessions successfully retrieved.' })
   async getCurrentYearSessions(): Promise<Session[]> {
