@@ -190,11 +190,7 @@ export class ConferencesService {
 
   async deleteConference(conferenceId: string) {
     const conference = await this.conferenceModel
-      .findByIdAndDelete(conferenceId)
-      .populate({
-        path: 'project',
-        populate: 'student',
-      });
+      .findByIdAndDelete(conferenceId);
     if (!conference)
       throw new NotFoundException(`Conference id ${conferenceId} not found`);
     else {
@@ -206,9 +202,7 @@ export class ConferencesService {
     }
   }
 
-  async getProfessorConference(
-    professorEmail: string,
-  ): Promise<Conference[]> {
+  async getProfessorConference(professorEmail: string): Promise<Conference[]> {
     const professor = await this.professorsService.getProfessorByEmail(
       professorEmail,
     );

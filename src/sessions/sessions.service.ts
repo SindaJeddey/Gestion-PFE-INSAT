@@ -49,10 +49,6 @@ export class SessionsService {
     return session;
   }
 
-  async getAllSessions(): Promise<Session[]> {
-    return await this.sessionModel.find().exec();
-  }
-
   async updateSession(
     sessionId: string,
     updates: UpdatedSessionDto,
@@ -79,15 +75,11 @@ export class SessionsService {
       throw new NotFoundException(`Session id ${sessionId} not found`);
   }
 
-  //Refacotr next methods for optimal fetchiiiing
-  async reserveSession(
-    reserveSession: SessionDto,
-    studentEmail: string,
-  ) {
+  async reserveSession(reserveSession: SessionDto, studentEmail: string) {
     const project = await this.projectsService.getStudentCurrentProject(
       studentEmail,
     );
-    if (project.session)
+    if (project.session && project.state === State.PENDING)
       throw new BadRequestException(
         `Project already pending for session ${project.session._id}`,
       );
