@@ -39,7 +39,7 @@ export class SessionsService {
 
   async getCurrentYearSessions(): Promise<Session[]> {
     const academicYear = await this.academicYearService.getCurrentAcademicYear();
-    return await this.sessionModel.find({ academicYear }).exec();
+    return await this.sessionModel.find({ academicYear }).populate('president').exec();
   }
 
   async getSession(sessionId: string): Promise<Session> {
