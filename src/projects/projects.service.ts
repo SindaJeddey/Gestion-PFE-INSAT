@@ -14,6 +14,7 @@ import { UpdatedProjectDto } from './model/dto/updated-project.dto';
 import { EnterprisesService } from '../enterprises/enterprises.service';
 import { AcademicYearService } from '../academic-year/academic-year.service';
 import { MailingService } from '../mailing/mailing.service';
+import { State } from "./model/state.enum";
 
 @Injectable()
 export class ProjectsService {
@@ -69,6 +70,7 @@ export class ProjectsService {
       level: student.level,
       academicYear: academicYear._id,
       enterprise,
+      state: State.NONE,
     });
     const saved = await project.save();
     if (saved) {
@@ -88,7 +90,9 @@ export class ProjectsService {
 
   //by admin
   async getProject(projectId: string): Promise<Project> {
-    const project = await this.projectModel.findById(projectId);
+    const project = await this.projectModel
+      .findById(projectId)
+      .populate('student supervisor');
     if (!project)
       throw new NotFoundException(`Project id ${projectId} Not Found`);
     else return project;
@@ -98,6 +102,7 @@ export class ProjectsService {
     const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel
       .findOne({ student: student, level: student.level })
+      .populate('student')
       .exec();
     if (!project)
       throw new NotFoundException(
@@ -129,14 +134,14 @@ export class ProjectsService {
 
   async updateProject(
     studentEmail: string,
-    updates: UpdatedProjectDto,
+    updates: UpdatedProjectDto | any,
   ): Promise<Project> {
     const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel.findOneAndUpdate(
       { student },
       { ...updates },
       { new: true },
-    );
+    ).populate('student');
     if (!project)
       throw new NotFoundException(
         `Project for Student ${studentEmail} Not Found`,
@@ -170,7 +175,6 @@ export class ProjectsService {
       );
     }
   }
-
 
   async acceptProject(
     professorEmail: string,

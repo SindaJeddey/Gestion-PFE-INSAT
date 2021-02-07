@@ -7,7 +7,10 @@ import { AcademicYearService } from '../academic-year/academic-year.service';
 import { ProfessorsService } from '../professors/professors.service';
 import { UpdatedSessionDto } from "./model/dto/updated-session.dto";
 import { ProjectsService } from "../projects/projects.service";
-import { ReserveSessionDto } from "./model/dto/reserve-session.dto";
+import { SessionDto } from "./model/dto/session.dto";
+import { State } from "../projects/model/state.enum";
+import { UpdatedProjectDto } from "../projects/model/dto/updated-project.dto";
+import { MailingService } from "../mailing/mailing.service";
 
 @Injectable()
 export class SessionsService {
@@ -16,6 +19,7 @@ export class SessionsService {
     private academicYearService: AcademicYearService,
     private professorsService: ProfessorsService,
     private projectsService: ProjectsService,
+    private mailingService: MailingService,
   ) {}
 
   async createNewSession(newSession: NewSessionDto): Promise<Session> {
@@ -75,24 +79,76 @@ export class SessionsService {
       throw new NotFoundException(`Session id ${sessionId} not found`);
   }
 
-  // async reserveSession(
-  //   reserveSession: ReserveSessionDto,
-  //   studentEmail: string,
-  // ) {
-  //   const project = await this.projectsService.getStudentCurrentProject(
-  //     studentEmail,
-  //   );
-  //   if (project.session)
-  //     throw new BadRequestException(
-  //       `Project already pending for session ${project.session}`,
-  //     );
-  //   const session = await this.sessionModel.findOne({
-  //     _id: reserveSession.sessionId,
-  //   });
-  //   if(!session)
-  //     throw new NotFoundException(`Session ${reserveSession.sessionId} not found.`);
-  //   else
-  //     await this.projectsService.updateProject(s)
-  //
-  // }
+  //Refacotr next methods for optimal fetchiiiing
+  async reserveSession(
+    reserveSession: SessionDto,
+    studentEmail: string,
+  ) {
+    const project = await this.projectsService.getStudentCurrentProject(
+      studentEmail,
+    );
+    if (project.session)
+      throw new BadRequestException(
+        `Project already pending for session ${project.session._id}`,
+      );
+    const session = await this.sessionModel.findById(reserveSession.sessionId);
+    if (!session)
+      throw new NotFoundException(
+        `Session ${reserveSession.sessionId} not found.`,
+      );
+    else {
+      const updates = new UpdatedProjectDto();
+      updates.session = session;
+      updates.state = State.PENDING;
+      const updatedProject = await this.projectsService.updateProject(
+        studentEmail,
+        updates,
+      );
+      if (updatedProject)
+        await this.mailingService.sendEmail(
+          updatedProject.student.email,
+          'Project Pending For Session',
+          `Dear ${updatedProject.student.name} ${updatedProject.student.lastName},\n Your project "${updatedProject.title}" is now pending for demanded session. Please check the platform for more details.`,
+        );
+    }
+  }
+
+  async confirmProject(studentEmail: string) {
+    const project = await this.projectsService.getStudentCurrentProject(
+      studentEmail,
+    );
+    if (project.state === State.NONE || !project.session)
+      throw new BadRequestException(
+        `Project ${project._id} is not even pending`,
+      );
+    else {
+      const session = await this.sessionModel.findById(project.session);
+      const updates = new UpdatedProjectDto();
+      if (session.conferences.length < session.capacity) {
+        updates.state = State.CONFIRMED;
+        const updatedProject = await this.projectsService.updateProject(
+          studentEmail,
+          updates,
+        );
+        if (updatedProject)
+          await this.mailingService.sendEmail(
+            updatedProject.student.email,
+            'Project Confirmed For Session',
+            `Dear ${updatedProject.student.name} ${updatedProject.student.lastName},\n Your project "${updatedProject.title}" is now confirmed for demanded session. Please check the platform for more details.`,
+          );
+      } else {
+        updates.session = null;
+        const updatedProject = await this.projectsService.updateProject(
+          studentEmail,
+          updates,
+        );
+        if (updatedProject)
+          await this.mailingService.sendEmail(
+            updatedProject.student.email,
+            'Project Not Confirmed For Session',
+            `Dear ${updatedProject.student.name} ${updatedProject.student.lastName},\n The session you demanded has reached its maximum capacity.\nMake sure to reserve for the next session. Please check the platform for more details.`,
+          );
+      }
+    }
+  }
 }

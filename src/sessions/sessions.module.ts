@@ -6,6 +6,7 @@ import { AcademicYearModule } from '../academic-year/academic-year.module';
 import { ProfessorsModule } from '../professors/professors.module';
 import { SessionsController } from './sessions.controller';
 import { ProjectsModule } from "../projects/projects.module";
+import { MailingModule } from "../mailing/mailing.module";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ProjectsModule } from "../projects/projects.module";
     AcademicYearModule,
     ProfessorsModule,
     ProjectsModule,
+    MailingModule,
   ],
   providers: [SessionsService],
   exports: [SessionsService],

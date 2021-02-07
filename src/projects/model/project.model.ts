@@ -36,12 +36,14 @@ export const ProjectSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
-  pendingForSession: {
-    type: Boolean,
+  state: {
+    type: String,
+    enum: ['NONE', 'PENDING', 'CONFIRMED'],
     required: true,
   },
   session: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Session',
   },
   level: {
     type: String,
@@ -73,8 +75,8 @@ export interface Project extends mongoose.Document {
   acceptedBySupervisor: boolean;
   validity: boolean;
   level: string;
-  pendingForSession: boolean;
-  session: string;
+  state: string;
+  session: Session;
   academicYear: AcademicYear;
   enterprise: Enterprise;
   enterpriseSupervisor: string;

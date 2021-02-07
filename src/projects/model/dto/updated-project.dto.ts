@@ -1,7 +1,9 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
+import { Session } from "../../../sessions/model/session.model";
+import { State } from "../state.enum";
 
-export class UpdatedProjectDto {
+export class  UpdatedProjectDto {
   @IsString()
   @IsOptional()
   @ApiProperty({ type: String, required: false })
@@ -17,6 +19,12 @@ export class UpdatedProjectDto {
   @ApiProperty({ type: [String], required: false })
   tags: string[];
 
-  session
+  @IsOptional()
+  @ApiProperty({ required: false })
+  session: Session;
 
+  @IsOptional()
+  @IsEnum(State)
+  @ApiProperty({ type: String, enum: State, required: false })
+  state: string;
 }

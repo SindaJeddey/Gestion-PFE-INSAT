@@ -25,4 +25,5 @@ export class UpdatedSessionDto {
   @IsOptional()
   @ApiProperty({ type: String, required: true })
   president: string | any;
+
 }

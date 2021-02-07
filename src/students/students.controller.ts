@@ -21,7 +21,6 @@ export class StudentsController {
   @ApiResponse({ status: 200, description: 'Student successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   async getStudentProfile(@User() student): Promise<Student> {
-    console.log(student);
     return await this.studentsService.getStudentByEmail(student.email);
   }
 

@@ -125,8 +125,8 @@ export class ProjectsController {
   }
 
   @Put('accept/:id')
-  // @Roles(Role.PROFESSOR)
-  @Public()
+  @Roles(Role.PROFESSOR)
+  // @Public()
   @ApiOperation({ description: 'Validating a project by the supervisor.' })
   @ApiResponse({ status: 201, description: 'Project successfully accepted.' })
   @ApiResponse({ status: 404, description: 'Project not found .' })

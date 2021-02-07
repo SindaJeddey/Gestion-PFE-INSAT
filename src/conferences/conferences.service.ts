@@ -1,20 +1,17 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Conference } from './model/conference.model';
-import { NewConferenceDto } from './model/dto/new-conference.dto';
-import { ProfessorsService } from '../professors/professors.service';
-import { ProjectsService } from '../projects/projects.service';
-import { SessionsService } from '../sessions/sessions.service';
-import { Professor } from '../professors/model/professor.model';
-import { Session } from '../sessions/model/session.model';
-import { Project } from '../projects/model/project.model';
-import { UpdateConferenceDto } from './model/dto/update-conference.dto';
-import { MailingService } from '../mailing/mailing.service';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Conference } from "./model/conference.model";
+import { NewConferenceDto } from "./model/dto/new-conference.dto";
+import { ProfessorsService } from "../professors/professors.service";
+import { ProjectsService } from "../projects/projects.service";
+import { SessionsService } from "../sessions/sessions.service";
+import { Professor } from "../professors/model/professor.model";
+import { Session } from "../sessions/model/session.model";
+import { Project } from "../projects/model/project.model";
+import { UpdateConferenceDto } from "./model/dto/update-conference.dto";
+import { MailingService } from "../mailing/mailing.service";
+import { State } from "../projects/model/state.enum";
 
 @Injectable()
 export class ConferencesService {
@@ -63,6 +60,10 @@ export class ConferencesService {
     const project = await this.projectsService.getProject(projectId);
     if (!project.validity)
       throw new BadRequestException(`Project ${projectId} not validated yet`);
+    if (project.state !== State.CONFIRMED)
+      throw new BadRequestException(
+        `Project ${projectId} not confirmed for yet`,
+      );
     const conference = await this.conferenceModel.findOne({ project });
     if (!conference) return project;
     else
@@ -90,6 +91,13 @@ export class ConferencesService {
       project.supervisor._id,
       date,
     );
+    if (
+      supervisor._id.toString() === inspector._id.toString() ||
+      supervisor._id.toString() === president._id.toString() ||
+      president._id.toString() === inspector._id.toString()
+    )
+      throw new BadRequestException('Invalid Jury');
+    console.log(project);
     const conference = new this.conferenceModel({
       date,
       session,
@@ -102,6 +110,8 @@ export class ConferencesService {
     });
     const savedConference = await conference.save();
     if (savedConference) {
+      session.conferences.push(savedConference);
+      await session.save();
       await this.mailingService.sendEmail(
         project.student.email,
         'Project Conference',
@@ -116,14 +126,16 @@ export class ConferencesService {
     return await this.conferenceModel
       .find({ session })
       .populate('president student project supervisor inspector')
-      .exec(); // populate the whole session
+      .exec();
   }
 
-  async updateConference(
-    conferenceId: string,
-    updates: UpdateConferenceDto,
-  ): Promise<Conference> {
-    const oldConference = await this.conferenceModel.findById(conferenceId);
+  async updateConference(conferenceId: string, updates: UpdateConferenceDto) {
+    const oldConference = await this.conferenceModel
+      .findById(conferenceId)
+      .populate({
+        path: 'project',
+        populate: 'student',
+      });
     if (!oldConference)
       throw new NotFoundException(`Conference id ${conferenceId} not found`);
 
@@ -166,23 +178,23 @@ export class ConferencesService {
         );
       updates = { ...updates, president };
     }
-    const updatedConference = await oldConference.update(updates, {
-      new: true,
-    });
+    const updatedConference = await oldConference.update(updates,{new: true} );
     if (updatedConference) {
       await this.mailingService.sendEmail(
-        updatedConference.project.student.email,
+        oldConference.project.student.email,
         'Project Conference Updated',
-        `Dear ${updatedConference.project.student.name} ${updatedConference.project.student.lastName},\n The conference for your project "${updatedConference.project.title}" has been updated. Please check the platform for more details.`,
+        `Dear ${oldConference.project.student.name} ${oldConference.project.student.lastName},\n The conference for your project "${oldConference.project.title}" has been updated. Please check the platform for more details.`,
       );
-      return updatedConference;
     }
   }
 
   async deleteConference(conferenceId: string) {
-    const conference = await this.conferenceModel.findByIdAndDelete(
-      conferenceId,
-    );
+    const conference = await this.conferenceModel
+      .findByIdAndDelete(conferenceId)
+      .populate({
+        path: 'project',
+        populate: 'student',
+      });
     if (!conference)
       throw new NotFoundException(`Conference id ${conferenceId} not found`);
     else {
@@ -194,11 +206,13 @@ export class ConferencesService {
     }
   }
 
-  async getProfessorConference(professorEmail: string): Promise<any[]> {
+  async getProfessorConference(
+    professorEmail: string,
+  ): Promise<Conference[]> {
     const professor = await this.professorsService.getProfessorByEmail(
       professorEmail,
     );
-    const conferences = await this.conferenceModel
+    return await this.conferenceModel
       .find({
         $or: [
           { president: professor },
@@ -206,15 +220,7 @@ export class ConferencesService {
           { supervisor: professor },
         ],
       })
+      .populate('president supervisor inspector')
       .exec();
-    conferences.map((conference) => {
-      if (conference.president.email === professorEmail)
-        return { conference, role: 'Président' };
-      if (conference.inspector.email === professorEmail)
-        return { conference, role: 'Examinateur' };
-      if (conference.supervisor.email === professorEmail)
-        return { conference, role: 'Encadrant' };
-    });
-    return conferences;
   }
 }
