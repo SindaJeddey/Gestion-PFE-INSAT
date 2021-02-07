@@ -1,8 +1,9 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  NotFoundException
+} from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Project } from './model/project.model';
@@ -169,6 +170,7 @@ export class ProjectsService {
       );
     }
   }
+
 
   async acceptProject(
     professorEmail: string,

@@ -16,6 +16,11 @@ export class NewStudentDto {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ type: String, required: true , description:"CIN étudiant"})
+  cin: string;
+
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({ type: String, required: true })
   name: string;
 

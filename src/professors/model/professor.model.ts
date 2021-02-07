@@ -23,6 +23,14 @@ export const ProfessorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  cin: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (value) => /^[0-9]*$/.test(value),
+      message: 'Invalid CIN',
+    },
+  },
   department: {
     type: String,
     enum: ['GPI', 'GMI', 'GBC'],

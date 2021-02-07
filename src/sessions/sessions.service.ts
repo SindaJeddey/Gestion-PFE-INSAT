@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Session } from './model/session.model';
@@ -6,6 +6,8 @@ import { NewSessionDto } from './model/dto/new-session.dto';
 import { AcademicYearService } from '../academic-year/academic-year.service';
 import { ProfessorsService } from '../professors/professors.service';
 import { UpdatedSessionDto } from "./model/dto/updated-session.dto";
+import { ProjectsService } from "../projects/projects.service";
+import { ReserveSessionDto } from "./model/dto/reserve-session.dto";
 
 @Injectable()
 export class SessionsService {
@@ -13,6 +15,7 @@ export class SessionsService {
     @InjectModel('Session') private sessionModel: Model<Session>,
     private academicYearService: AcademicYearService,
     private professorsService: ProfessorsService,
+    private projectsService: ProjectsService,
   ) {}
 
   async createNewSession(newSession: NewSessionDto): Promise<Session> {
@@ -71,4 +74,25 @@ export class SessionsService {
     if (!session)
       throw new NotFoundException(`Session id ${sessionId} not found`);
   }
+
+  // async reserveSession(
+  //   reserveSession: ReserveSessionDto,
+  //   studentEmail: string,
+  // ) {
+  //   const project = await this.projectsService.getStudentCurrentProject(
+  //     studentEmail,
+  //   );
+  //   if (project.session)
+  //     throw new BadRequestException(
+  //       `Project already pending for session ${project.session}`,
+  //     );
+  //   const session = await this.sessionModel.findOne({
+  //     _id: reserveSession.sessionId,
+  //   });
+  //   if(!session)
+  //     throw new NotFoundException(`Session ${reserveSession.sessionId} not found.`);
+  //   else
+  //     await this.projectsService.updateProject(s)
+  //
+  // }
 }

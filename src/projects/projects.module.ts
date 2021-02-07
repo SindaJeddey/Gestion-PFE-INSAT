@@ -10,6 +10,8 @@ import { EnterpriseSchema } from '../enterprises/model/enterprise.model';
 import { EnterprisesModule } from "../enterprises/enterprises.module";
 import { AcademicYearModule } from "../academic-year/academic-year.module";
 import { MailingModule } from "../mailing/mailing.module";
+import { SessionsService } from "../sessions/sessions.service";
+import { SessionsModule } from "../sessions/sessions.module";
 
 @Module({
   imports: [

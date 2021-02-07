@@ -17,4 +17,6 @@ export class UpdatedProjectDto {
   @ApiProperty({ type: [String], required: false })
   tags: string[];
 
+  session
+
 }

@@ -15,7 +15,6 @@ import { SessionsModule } from './sessions/sessions.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ConferencesModule } from './conferences/conferences.module';
 import * as dotenv from 'dotenv';
-import { IdVerificationMiddleware } from './middlewares/id-verification.middleware';
 import { AcademicYearModule } from './academic-year/academic-year.module';
 import { EnterprisesModule } from './enterprises/enterprises.module';
 import { MailingModule } from './mailing/mailing.module';
@@ -44,15 +43,4 @@ dotenv.config();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): any {
-    consumer
-      .apply(IdVerificationMiddleware)
-      .exclude({ path: '*/profile', method: RequestMethod.GET })
-      .forRoutes(
-        { path: '*/:id', method: RequestMethod.GET },
-        { path: '*/:id', method: RequestMethod.PUT },
-        { path: '*/:id', method: RequestMethod.DELETE },
-      );
-  }
-}
+export class AppModule {}

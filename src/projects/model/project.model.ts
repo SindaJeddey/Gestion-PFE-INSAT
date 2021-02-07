@@ -3,6 +3,7 @@ import { Student } from '../../students/model/student.model';
 import { Professor } from '../../professors/model/professor.model';
 import { Enterprise } from '../../enterprises/model/enterprise.model';
 import { AcademicYear } from "../../academic-year/model/academic-year.model";
+import { Session } from "../../sessions/model/session.model";
 
 export const ProjectSchema = new mongoose.Schema({
   title: {
@@ -35,6 +36,13 @@ export const ProjectSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  pendingForSession: {
+    type: Boolean,
+    required: true,
+  },
+  session: {
+    type: String,
+  },
   level: {
     type: String,
     enum: ['CYCLE', 'MASTER', 'LICENCE'],
@@ -65,6 +73,8 @@ export interface Project extends mongoose.Document {
   acceptedBySupervisor: boolean;
   validity: boolean;
   level: string;
+  pendingForSession: boolean;
+  session: string;
   academicYear: AcademicYear;
   enterprise: Enterprise;
   enterpriseSupervisor: string;

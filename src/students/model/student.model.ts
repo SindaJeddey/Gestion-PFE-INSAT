@@ -17,6 +17,16 @@ export const StudentSchema = new mongoose.Schema({
   nce: {
     type: String,
     required: true,
+    unique: true,
+    validate: {
+      validator: (value) => /^[0-9]*$/.test(value),
+      message: 'Invalid Student Number',
+    },
+  },
+  cin: {
+    type: String,
+    required: true,
+    unique: true,
     validate: {
       validator: (value) => /^[0-9]*$/.test(value),
       message: 'Invalid Student Number',
@@ -45,6 +55,7 @@ export const StudentSchema = new mongoose.Schema({
 export interface Student extends mongoose.Document {
   email: string;
   nce: string;
+  cin: string;
   name: string;
   lastName: string;
   field: string;
