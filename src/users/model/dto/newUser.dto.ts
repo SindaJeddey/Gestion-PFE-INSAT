@@ -9,6 +9,16 @@ export class NewUserDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true })
+  lastName: string;
+
+  @IsString()
   @IsEnum(Role)
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true })

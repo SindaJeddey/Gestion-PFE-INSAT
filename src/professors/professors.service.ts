@@ -22,6 +22,8 @@ export class ProfessorsService {
       const savedUser = this.userService.newUser({
         email: newProfessor.email,
         role: Role.PROFESSOR,
+        name: newProfessor.name,
+        lastName: newProfessor.lastName,
       });
       if (savedUser) await professor.save();
     }

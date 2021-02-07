@@ -11,7 +11,6 @@ import { SessionDto } from "./model/dto/session.dto";
 import { State } from "../projects/model/state.enum";
 import { UpdatedProjectDto } from "../projects/model/dto/updated-project.dto";
 import { MailingService } from "../mailing/mailing.service";
-import { Project } from "../projects/model/project.model";
 
 @Injectable()
 export class SessionsService {
@@ -44,7 +43,10 @@ export class SessionsService {
   }
 
   async getSession(sessionId: string): Promise<Session> {
-    const session = await this.sessionModel.findById(sessionId).exec();
+    const session = await this.sessionModel
+      .findById(sessionId)
+      .populate('president')
+      .exec();
     if (!session)
       throw new NotFoundException(`Session id ${sessionId} not found`);
     return session;

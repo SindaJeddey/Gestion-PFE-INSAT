@@ -33,7 +33,7 @@ export class ProfessorsController {
     description: 'Professor successfully retrieved.',
   })
   @ApiResponse({ status: 404, description: 'Professor not found.' })
-  async getStudentProfile(@User() professor): Promise<Professor> {
+  async getProfessorProfile(@User() professor): Promise<Professor> {
     return await this.professorsService.getProfessorByEmail(professor.email);
   }
 

@@ -28,7 +28,7 @@ export class AuthenticationService {
         throw new NotFoundException('Wrong Password');
       else {
         const academicYear = await this.academicYearService.getCurrentAcademicYear();
-        const payload = { email: user.email, role: user.role, academicYear };
+        const payload = { email: user.email, role: user.role, academicYear, name:user.name, lastName:user.lastName};
         return { accessToken: this.jwtService.sign(payload) };
       }
     }

@@ -13,6 +13,14 @@ export const UserSchema = new mongoose.Schema({
       message: 'Email Not Valid',
     },
   },
+  name: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,
@@ -28,6 +36,8 @@ export const UserSchema = new mongoose.Schema({
 export interface User extends mongoose.Document {
   salt: any;
   email: string;
+  name: string;
+  lastName: string;
   password: string;
   role: string;
 }

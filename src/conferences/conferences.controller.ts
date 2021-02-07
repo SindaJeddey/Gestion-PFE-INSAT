@@ -53,6 +53,8 @@ export class ConferencesController {
     return await this.conferencesService.getConferencesPerSession(conferenceId);
   }
 
+  //get a single conference
+
   @Post()
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Creating a conference.' })

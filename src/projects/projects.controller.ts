@@ -7,6 +7,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@ne
 import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
 import { User } from "../decorators/user.decorator";
+import { Public } from "../decorators/public.decorator";
 
 enum SupervisedProjects {
   CURRENT = 'current',

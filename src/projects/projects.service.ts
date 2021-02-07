@@ -81,7 +81,7 @@ export class ProjectsService {
         `Dear ${supervisor.name} ${supervisor.lastName},\n You have a new project pending. Please check the platform for more details.`,
       );
     }
-    return saved;
+    return await this.projectModel.populate(saved, 'enterprise supervisor');
   }
 
   async getProject(projectId: string): Promise<Project> {
