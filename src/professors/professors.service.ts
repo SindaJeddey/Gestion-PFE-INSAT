@@ -71,5 +71,4 @@ export class ProfessorsService {
     if (!professor)
       throw new NotFoundException(`Professor ${professorId} not found`);
   }
-
 }

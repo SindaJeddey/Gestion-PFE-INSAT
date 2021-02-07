@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './model/user.model';
@@ -22,6 +22,9 @@ export class UsersService {
 
   async newUser(newUser: NewUserDto) {
     await this.academicYearService.getCurrentAcademicYear();
+    const existingUser = await this.userModel.findOne({ email: newUser.email });
+    if (existingUser)
+      throw new ConflictException(`User ${newUser.email} already existing.`);
     const user = new this.userModel(newUser);
     user.salt = await bcrypt.genSalt();
     const password = UsersService.generatePassword();

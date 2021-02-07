@@ -83,7 +83,6 @@ export class ProjectsService {
     return saved;
   }
 
-  //by admin
   async getProject(projectId: string): Promise<Project> {
     const project = await this.projectModel
       .findById(projectId)
