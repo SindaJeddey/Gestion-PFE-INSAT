@@ -21,6 +21,11 @@ export class NewProfessorDto {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ type: String, required: true , description:"CIN Professeur"})
+  cin: string;
+
+  @IsString()
+  @IsNotEmpty()
   @IsEnum(Departments)
   @ApiProperty({ enum: Departments, required: true })
   department: string;
