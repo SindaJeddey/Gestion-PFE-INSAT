@@ -22,15 +22,16 @@ export class ProjectsService {
     private mailingService: MailingService,
   ) {}
 
-  async addProject(newProject: NewProjectDto): Promise<Project> {
-    const student = await this.studentsService.getStudentByEmail(
-      newProject.student,
-    );
+  async addProject(
+    newProject: NewProjectDto,
+    studentEmail: string,
+  ): Promise<Project> {
+    const student = await this.studentsService.getStudentByEmail(studentEmail);
 
     const projects = await this.projectModel.find({ student: student }).exec();
     if (projects.length === 3) {
       throw new ConflictException(
-        `Student id ${newProject.student} already has 3 projects`,
+        `Student id ${studentEmail} already has 3 projects`,
       );
     } else {
       const existingProject = projects.filter(
@@ -38,7 +39,7 @@ export class ProjectsService {
       );
       if (existingProject.length !== 0)
         throw new ConflictException(
-          `Student id ${newProject.student} already has a project for his level`,
+          `Student id ${studentEmail} already has a project for his level`,
         );
     }
     const supervisor = await this.professorsService.getProfessorByEmail(

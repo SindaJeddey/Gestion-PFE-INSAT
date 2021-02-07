@@ -18,11 +18,6 @@ export class NewProjectDto {
   @ApiProperty({ type: String, required: true, description: 'Supervisor email' })
   supervisor: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, description: 'Student email' })
-  student: string;
-
   @IsOptional()
   @ApiProperty({ type: [String], required: false })
   tags: string[];

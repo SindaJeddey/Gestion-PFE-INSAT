@@ -95,8 +95,8 @@ export class ProjectsController {
   @ApiOperation({ description: 'Adding a project.' })
   @ApiResponse({ status: 201, description: 'Project successfully added.' })
   @ApiResponse({ status: 409, description: 'Student already has a project.' })
-  async addProject(@Body() newProject: NewProjectDto): Promise<Project> {
-    return await this.projectsService.addProject(newProject);
+  async addProject(@Body() newProject: NewProjectDto, @User() student): Promise<Project> {
+    return await this.projectsService.addProject(newProject, student.email);
   }
 
   @Put('validate/:id')
