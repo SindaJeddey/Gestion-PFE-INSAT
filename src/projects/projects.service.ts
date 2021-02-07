@@ -244,6 +244,7 @@ export class ProjectsService {
     );
     return await this.projectModel
       .find({ supervisor: supervisorToBe, acceptedBySupervisor: false })
+      .populate('student supervisor enterprise')
       .exec();
   }
 
