@@ -14,7 +14,7 @@ export class UsersController {
   @Put('password')
   @Roles(Role.PROFESSOR, Role.ADMIN, Role.STUDENT)
   @ApiOperation({ description: "Updating a user's password" })
-  @ApiResponse({ status: 201, description: 'Password successfully updated.' })
+  @ApiResponse({ status: 204, description: 'Password successfully updated.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async changePassword(
     @User() user,

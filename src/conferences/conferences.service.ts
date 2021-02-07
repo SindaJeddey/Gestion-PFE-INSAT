@@ -194,6 +194,27 @@ export class ConferencesService {
     }
   }
 
-  //get professor current year conferences : conferences + role prof dans le jury en français
-
+  async getProfessorConference(professorEmail: string): Promise<any[]> {
+    const professor = await this.professorsService.getProfessorByEmail(
+      professorEmail,
+    );
+    const conferences = await this.conferenceModel
+      .find({
+        $or: [
+          { president: professor },
+          { inspector: professor },
+          { supervisor: professor },
+        ],
+      })
+      .exec();
+    conferences.map((conference) => {
+      if (conference.president.email === professorEmail)
+        return { conference, role: 'Président' };
+      if (conference.inspector.email === professorEmail)
+        return { conference, role: 'Examinateur' };
+      if (conference.supervisor.email === professorEmail)
+        return { conference, role: 'Encadrant' };
+    });
+    return conferences;
+  }
 }

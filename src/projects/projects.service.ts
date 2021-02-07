@@ -115,8 +115,13 @@ export class ProjectsService {
     let filter;
     if (state !== 'all') {
       const academicYear = await this.academicYearService.getCurrentAcademicYear();
-      if (state === 'current') filter = { supervisor, academicYear };
-      else filter = { supervisor, academicYear: { $ne: academicYear } };
+      if (state === 'current')
+        filter = { supervisor, academicYear, acceptedBySupervisor: true };
+      else
+        filter = {
+          supervisor,
+          academicYear: { $ne: academicYear },
+        };
     }
     return await this.projectModel.find(filter).exec();
   }
@@ -144,12 +149,14 @@ export class ProjectsService {
   }
 
   async validateProject(projectId: string) {
-    const project = await this.projectModel.findOneAndUpdate(
-      { _id: projectId, acceptedBySupervisor: true },
-      {
-        validity: true,
-      },
-    );
+    const project = await this.projectModel
+      .findOneAndUpdate(
+        { _id: projectId, acceptedBySupervisor: true },
+        {
+          validity: true,
+        },
+      )
+      .populate('student');
     if (!project)
       throw new NotFoundException(
         `Project ${projectId} Not Found or not accepted by supervisor yet`,
@@ -163,13 +170,15 @@ export class ProjectsService {
     }
   }
 
-  //By Professor
   async acceptProject(
     professorEmail: string,
     projectId: string,
   ): Promise<Project> {
-    const project = await this.projectModel.findById(projectId);
+    const project = await this.projectModel
+      .findById(projectId)
+      .populate('supervisor student');
     if (!project) throw new NotFoundException(`Project ${projectId} Not Found`);
+    console.log(project);
     if (project.supervisor.email !== professorEmail)
       throw new ConflictException(
         `Project ${projectId} doesn't correspond to supervisor ${professorEmail}`,
@@ -218,5 +227,20 @@ export class ProjectsService {
         `Dear ${project.student.name} ${project.student.lastName},\n Your project "${project.title}" has been deleted. Please check the platform for more details..`,
       );
     }
+  }
+
+  async getProjectsToBeAcceptedByProfessor(
+    professorEmail: string,
+  ): Promise<Project[]> {
+    const supervisorToBe = await this.professorsService.getProfessorByEmail(
+      professorEmail,
+    );
+    return await this.projectModel
+      .find({ supervisor: supervisorToBe, acceptedBySupervisor: false })
+      .exec();
+  }
+
+  async getProjectsToBeValidatedByAdmin(): Promise<Project[]> {
+    return await this.projectModel.find({ validity: false }).exec();
   }
 }

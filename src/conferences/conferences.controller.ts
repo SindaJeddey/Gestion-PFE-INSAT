@@ -6,11 +6,34 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UpdateConferenceDto } from "./model/dto/update-conference.dto";
 import { Roles } from "../decorators/roles.decorator";
 import { Role } from "../users/model/role.enum";
+import { User } from "../decorators/user.decorator";
 
 @Controller('conferences')
 @ApiTags('Conferences')
 export class ConferencesController {
   constructor(private conferencesService: ConferencesService) {}
+
+  @Get('conferences')
+  @Roles(Role.PROFESSOR)
+  @ApiOperation({ description: 'Retrieving conferences of a jury member.' })
+  @ApiResponse({ status: 200, description: 'Conferences successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Professor not found.' })
+  async getProfessorConferences(@User() professor): Promise<any[]> {
+    return await this.conferencesService.getConferencesPerSession(
+      professor.email,
+    );
+  }
+
+  @Get('session/:id')
+  @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
+  @ApiOperation({ description: 'Retrieving conferences of a given session.' })
+  @ApiResponse({ status: 200, description: 'Conferences successfully retrieved.' })
+  @ApiResponse({ status: 400, description: 'Professors or date/room unavailable.' })
+  async getConferencesPerSession(
+    @Param('id') conferenceId: string,
+  ): Promise<Conference[]> {
+    return await this.conferencesService.getConferencesPerSession(conferenceId);
+  }
 
   @Post()
   @Roles(Role.ADMIN)
@@ -22,21 +45,10 @@ export class ConferencesController {
     return await this.conferencesService.createConference(newConference);
   }
 
-  @Get('session/:id')
-  @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
-  @ApiOperation({ description: 'Retrieving conferences of a given session.' })
-  @ApiResponse({ status: 201, description: 'Conferences successfully retrieved.' })
-  @ApiResponse({ status: 400, description: 'Professors or date/room unavailable.' })
-  async getConferencesPerSession(
-    @Param('id') conferenceId: string,
-  ): Promise<Conference[]> {
-    return await this.conferencesService.getConferencesPerSession(conferenceId);
-  }
-
   @Put(':id')
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Updating a conference.' })
-  @ApiResponse({ status: 201, description: 'Conference successfully updated.' })
+  @ApiResponse({ status: 200, description: 'Conference successfully updated.' })
   @ApiResponse({ status: 404, description: 'Conference not found.' })
   @ApiResponse({ status: 400, description: 'Professors or date/room unavailable.' })
   async updateConference(
@@ -52,7 +64,7 @@ export class ConferencesController {
   @Delete(':id')
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Deleting a conference.' })
-  @ApiResponse({ status: 201, description: 'Conference successfully deleted.' })
+  @ApiResponse({ status: 204, description: 'Conference successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Conference not found.' })
   async deleteConference(@Param('id') conferenceId: string) {
     await this.conferencesService.deleteConference(conferenceId);

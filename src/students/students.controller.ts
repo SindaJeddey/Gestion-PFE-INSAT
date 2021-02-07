@@ -7,52 +7,55 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
+import { Public } from "../decorators/public.decorator";
 
 @ApiTags('Students')
 @Controller('students')
 export class StudentsController {
   constructor(private studentsService: StudentsService) {}
 
-  @Post()
-  @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Adding a student.' })
-  @ApiResponse({ status: 201, description: 'Student successfully added.' })
-  async addStudent(
-    @User() user,
-    @Body() newStudent: NewStudentDto,
-  ): Promise<Student> {
-    console.log(user);
-    return await this.studentsService.addStudent(newStudent);
-  }
-
   @Get('profile')
-  @Roles(Role.STUDENT)
+  // @Roles(Role.STUDENT)
+  @Public()
   @ApiOperation({ description: 'Retrieving a student.' })
-  @ApiResponse({ status: 201, description: 'Student successfully retrieved.' })
+  @ApiResponse({ status: 200, description: 'Student successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   async getStudentProfile(@User() student): Promise<Student> {
+    console.log(student);
     return await this.studentsService.getStudentByEmail(student.email);
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
+  @Public()
   @ApiOperation({ description: 'Retrieving a student.' })
-  @ApiResponse({ status: 201, description: 'Student successfully retrieved.' })
+  @ApiResponse({ status: 200, description: 'Student successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   async getStudent(@Param('id') studentId: string, @User() user): Promise<Student> {
     return await this.studentsService.getStudentById(studentId);
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
+  @Public()
   @ApiOperation({ description: 'Retrieving all students.' })
-  @ApiResponse({ status: 201, description: 'Students successfully retrieved.' })
+  @ApiResponse({ status: 200, description: 'Students successfully retrieved.' })
   async getStudents(): Promise<Student[]> {
     return await this.studentsService.getAllStudent();
   }
 
+  @Post()
+  // @Roles(Role.ADMIN)
+  @Public()
+  @ApiOperation({ description: 'Adding students.' })
+  @ApiResponse({ status: 204, description: 'Students successfully added.' })
+  async addStudents(@Body() newStudents: NewStudentDto[]) {
+    await this.studentsService.addStudents(newStudents);
+  }
+
   @Put(':id')
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
+  @Public()
   @ApiOperation({ description: 'Updating a student' })
   @ApiResponse({ status: 201, description: 'Student successfully updated.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })

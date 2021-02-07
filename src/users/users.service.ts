@@ -6,12 +6,14 @@ import { NewUserDto } from './model/dto/newUser.dto';
 import * as bcrypt from 'bcrypt';
 import { MailingService } from "../mailing/mailing.service";
 import { UpdatedUserDto } from "./model/dto/updated-user.dto";
+import { AcademicYearService } from "../academic-year/academic-year.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     private mailingService: MailingService,
+    private academicYearService: AcademicYearService
   ) {}
 
   async findOne(email: string): Promise<User | undefined> {
@@ -19,6 +21,7 @@ export class UsersService {
   }
 
   async newUser(newUser: NewUserDto) {
+    await this.academicYearService.getCurrentAcademicYear();
     const user = new this.userModel(newUser);
     user.salt = await bcrypt.genSalt();
     const password = UsersService.generatePassword();

@@ -4,11 +4,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Payload } from './payload.interface';
 import { UsersService } from '../../users/users.service';
 import * as dotenv from 'dotenv';
+import { AcademicYearService } from "../../academic-year/academic-year.service";
 
 dotenv.config();
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private userService: UsersService) {
+  constructor(
+    private userService: UsersService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -21,7 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (user) {
       const { email, role } = user;
       console.log({ email, role });
-      return { email, role };
+      return {
+        email,
+        role,
+      };
     } else throw new UnauthorizedException();
   }
 }

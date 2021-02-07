@@ -19,8 +19,24 @@ import { User } from '../decorators/user.decorator';
 @Controller('sessions')
 @ApiTags('Sessions')
 export class SessionsController {
-  Project;
   constructor(private sessionsService: SessionsService) {}
+
+  @Get(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Get a session.' })
+  @ApiResponse({ status: 200, description: 'Session successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Session not found.' })
+  async getSession(@Param('id') sessionId: string): Promise<Session> {
+    return await this.sessionsService.getSession(sessionId);
+  }
+
+  @Get()
+  @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Get current academic year sessions.' })
+  @ApiResponse({ status: 200, description: 'Sessions successfully retrieved.' })
+  async getCurrentYearSessions(): Promise<Session[]> {
+    return await this.sessionsService.getCurrentYearSessions();
+  }
 
   @Post()
   @Roles(Role.ADMIN)
@@ -31,23 +47,6 @@ export class SessionsController {
   @ApiResponse({ status: 201, description: 'Session successfully created.' })
   async newSession(@Body() newSession: NewSessionDto): Promise<Session> {
     return this.sessionsService.createNewSession(newSession);
-  }
-
-  @Get()
-  @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Get current academic year sessions.' })
-  @ApiResponse({ status: 201, description: 'Sessions successfully retrieved.' })
-  async getCurrentYearSessions(): Promise<Session[]> {
-    return await this.sessionsService.getCurrentYearSessions();
-  }
-
-  @Get(':id')
-  @Roles(Role.ADMIN)
-  @ApiOperation({ description: 'Get a session.' })
-  @ApiResponse({ status: 201, description: 'Session successfully retrieved.' })
-  @ApiResponse({ status: 404, description: 'Session not found.' })
-  async getSession(@Param('id') sessionId: string): Promise<Session> {
-    return await this.sessionsService.getSession(sessionId);
   }
 
   @Put(':id')
@@ -64,6 +63,9 @@ export class SessionsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
+  @ApiOperation({ description: 'Delete a session.' })
+  @ApiResponse({ status: 204, description: 'Session successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Session not found.' })
   async deleteSession(@Param('id') sessionId: string) {
     await this.sessionsService.deleteSession(sessionId);
   }

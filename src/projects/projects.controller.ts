@@ -7,16 +7,18 @@ import {
   Param,
   Post,
   Put,
-  Query, UnauthorizedException
+  Query,
+  UnauthorizedException
 } from "@nestjs/common";
-import { ProjectsService } from './projects.service';
-import { NewProjectDto } from './model/dto/new-project.dto';
-import { Project } from './model/project.model';
-import { UpdatedProjectDto } from './model/dto/updated-project.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../decorators/roles.decorator';
-import { Role } from '../users/model/role.enum';
-import { User } from '../decorators/user.decorator';
+import { ProjectsService } from "./projects.service";
+import { NewProjectDto } from "./model/dto/new-project.dto";
+import { Project } from "./model/project.model";
+import { UpdatedProjectDto } from "./model/dto/updated-project.dto";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Roles } from "../decorators/roles.decorator";
+import { Role } from "../users/model/role.enum";
+import { User } from "../decorators/user.decorator";
+import { Public } from "../decorators/public.decorator";
 
 enum SupervisedProjects {
   CURRENT = 'current',
@@ -28,57 +30,13 @@ enum SupervisedProjects {
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
-  @Post()
-  @Roles(Role.STUDENT)
-  @ApiOperation({ description: 'Adding a project.' })
-  @ApiResponse({ status: 201, description: 'Project successfully added.' })
-  @ApiResponse({ status: 409, description: 'Student already has a project.' })
-  async addProject(
-    @Body() newProject: NewProjectDto,
-    @User() user,
-  ): Promise<Project> {
-    if (user.email !== newProject.student)
-      throw new UnauthorizedException(
-        "Can't create a project for a different user",
-      );
-    return await this.projectsService.addProject(newProject);
-  }
-
-  @Get()
-  @Roles(Role.STUDENT)
-  @ApiOperation({ description: 'Retrieving a project by the student.' })
-  @ApiResponse({ status: 201, description: 'Project successfully retrieved.' })
-  @ApiResponse({
-    status: 404,
-    description: 'Project not found or Student not found.',
-  })
-  async getStudentCurrentProject(@User() student): Promise<Project> {
-    return await this.projectsService.getStudentCurrentProject(student.email);
-  }
-
-  @Put()
-  @Roles(Role.STUDENT)
-  @ApiOperation({
-    description: 'Updating a project by the student.',
-  })
-  @ApiResponse({ status: 201, description: 'Project successfully updated.' })
-  @ApiResponse({
-    status: 404,
-    description: 'Project not found or Student not found.',
-  })
-  async updateProject(
-    @User() student,
-    @Body() updates: UpdatedProjectDto,
-  ): Promise<Project> {
-    return await this.projectsService.updateProject(student.email, updates);
-  }
-
   @Get('professor')
-  @Roles(Role.PROFESSOR)
+  // @Roles(Role.PROFESSOR)
+  @Public()
   @ApiOperation({
     description: 'Retrieving projects supervised by a professor',
   })
-  @ApiResponse({ status: 201, description: 'Projects successfully retrieved.' })
+  @ApiResponse({ status: 200, description: 'Projects successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'Professor not found.' })
   @ApiQuery({
     name: 'filter',
@@ -98,8 +56,64 @@ export class ProjectsController {
     else throw new BadRequestException('Invalid request');
   }
 
+  @Get('to-accept')
+  @Roles(Role.PROFESSOR)
+  // @Public()
+  @ApiOperation({
+    description: 'Retrieving projects to be accepted by supervisor',
+  })
+  @ApiResponse({ status: 200, description: 'Projects successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Professor not found.' })
+  async getProjectsToBeAccepted(@User() professor): Promise<Project[]> {
+    return await this.projectsService.getProjectsToBeAcceptedByProfessor(
+      professor.email,
+    );
+  }
+
+  @Get('to-validate')
+  // @Roles(Role.ADMIN)
+  @Public()
+  @ApiOperation({
+    description: 'Retrieving projects to be validated by admin',
+  })
+  @ApiResponse({ status: 200, description: 'Projects successfully retrieved.' })
+  async getProjectsToBeValidated(): Promise<Project[]> {
+    return await this.projectsService.getProjectsToBeValidatedByAdmin();
+  }
+
+  @Get()
+  // @Roles(Role.STUDENT)
+  @Public()
+  @ApiOperation({ description: 'Retrieving a project by the student.' })
+  @ApiResponse({ status: 200, description: 'Project successfully retrieved.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Project not found or Student not found.',
+  })
+  async getStudentCurrentProject(@User() student): Promise<Project> {
+    return await this.projectsService.getStudentCurrentProject(student.email);
+  }
+
+  @Post()
+  @Roles(Role.STUDENT)
+  // @Public()
+  @ApiOperation({ description: 'Adding a project.' })
+  @ApiResponse({ status: 201, description: 'Project successfully added.' })
+  @ApiResponse({ status: 409, description: 'Student already has a project.' })
+  async addProject(
+    @Body() newProject: NewProjectDto,
+    @User() user,
+  ): Promise<Project> {
+    if (user.email !== newProject.student)
+      throw new UnauthorizedException(
+        "Can't create a project for a different user",
+      );
+    return await this.projectsService.addProject(newProject);
+  }
+
   @Put('validate/:id')
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
+  @Public()
   @ApiOperation({ description: 'Validating a project by the admin.' })
   @ApiResponse({ status: 201, description: 'Project successfully validated.' })
   @ApiResponse({
@@ -111,7 +125,8 @@ export class ProjectsController {
   }
 
   @Put('accept/:id')
-  @Roles(Role.PROFESSOR)
+  // @Roles(Role.PROFESSOR)
+  @Public()
   @ApiOperation({ description: 'Validating a project by the supervisor.' })
   @ApiResponse({ status: 201, description: 'Project successfully accepted.' })
   @ApiResponse({ status: 404, description: 'Project not found .' })
@@ -122,21 +137,41 @@ export class ProjectsController {
     await this.projectsService.acceptProject(professor.email, projectId);
   }
 
-  @Delete()
+  @Put()
   @Roles(Role.STUDENT)
-  @ApiOperation({ description: 'Deleting a project by the student.' })
-  @ApiResponse({ status: 201, description: 'Project successfully deleted.' })
-  @ApiResponse({ status: 404, description: 'Project not found.' })
-  async deleteProjectByStudent(@User() student) {
-    await this.projectsService.deleteProjectByStudent(student.email);
+  // @Public()
+  @ApiOperation({
+    description: 'Updating a project by the student.',
+  })
+  @ApiResponse({ status: 201, description: 'Project successfully updated.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Project not found or Student not found.',
+  })
+  async updateProject(
+    @User() student,
+    @Body() updates: UpdatedProjectDto,
+  ): Promise<Project> {
+    return await this.projectsService.updateProject(student.email, updates);
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
+  @Public()
   @ApiOperation({ description: 'Deleting a project by the admin.' })
-  @ApiResponse({ status: 201, description: 'Project successfully deleted.' })
+  @ApiResponse({ status: 204, description: 'Project successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })
   async deleteProjectByAdmin(@Param('id') projectId: string) {
     await this.projectsService.deleteProjectByAdmin(projectId);
+  }
+
+  @Delete()
+  // @Roles(Role.STUDENT)
+  @Public()
+  @ApiOperation({ description: 'Deleting a project by the student.' })
+  @ApiResponse({ status: 204, description: 'Project successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Project not found.' })
+  async deleteProjectByStudent(@User() student) {
+    await this.projectsService.deleteProjectByStudent(student.email);
   }
 }

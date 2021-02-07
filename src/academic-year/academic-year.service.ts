@@ -12,7 +12,7 @@ export class AcademicYearService {
 
   async createNewAcademicYear(
     newYear: NewAcademicYearDto,
-  ): Promise<AcademicYear> {
+  ): Promise<any> {
     try {
       if (await this.getCurrentAcademicYear())
         throw new BadRequestException('An academic year is already happening');
@@ -27,11 +27,15 @@ export class AcademicYearService {
       startDate: new Date(newYear.startYear, 9, 1),
       endDate: new Date(newYear.endYear, 8, 31),
     });
-    console.log(academicYear);
-    return await academicYear.save();
+    const result = await academicYear.save();
+    return {
+      _id: result._id,
+      startDate: result.startDate.getFullYear(),
+      endDate: result.endDate.getFullYear(),
+    };
   }
 
-  async getCurrentAcademicYear(): Promise<AcademicYear> {
+  async getCurrentAcademicYear(): Promise<any> {
     const now = new Date();
     const currentAcademicYear = await this.academicYearModel.findOne({
       startDate: { $lte: now },
@@ -39,6 +43,10 @@ export class AcademicYearService {
     });
     if (!currentAcademicYear)
       throw new NotFoundException(`There is no current academic year`)
-    return currentAcademicYear;
+    return {
+      _id: currentAcademicYear._id,
+      startDate: currentAcademicYear.startDate.getFullYear(),
+      endDate: currentAcademicYear.endDate.getFullYear(),
+    };
   }
 }

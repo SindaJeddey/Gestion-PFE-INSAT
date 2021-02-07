@@ -5,12 +5,14 @@ import { JwtService } from '@nestjs/jwt';
 import { NewUserDto } from '../users/model/dto/newUser.dto';
 import { User } from '../users/model/user.model';
 import { UsersService } from '../users/users.service';
+import { AcademicYearService } from "../academic-year/academic-year.service";
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private academicYearService: AcademicYearService,
   ) {}
 
   async login(loginCredentials: UserLoginDto) {
@@ -25,7 +27,8 @@ export class AuthenticationService {
       if (hashedEnteredPassword !== user.password)
         throw new NotFoundException('Wrong Password');
       else {
-        const payload = { email: user.email, role: user.role, id: user._id };
+        const academicYear = await this.academicYearService.getCurrentAcademicYear();
+        const payload = { email: user.email, role: user.role, academicYear };
         return { 'access-token': this.jwtService.sign(payload) };
       }
     }

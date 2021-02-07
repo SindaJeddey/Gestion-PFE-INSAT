@@ -16,13 +16,15 @@ export class ProfessorsService {
     private mailingService: MailingService,
   ) {}
 
-  async addNewProfessor(newProfessor: NewProfessorDto): Promise<Professor> {
-    const professor = new this.professorModel(newProfessor);
-    const savedUser = this.userService.newUser({
-      email: newProfessor.email,
-      role: Role.PROFESSOR,
-    });
-    if (savedUser) return await professor.save();
+  async addNewProfessors(newProfessors: NewProfessorDto[]) {
+    for (const newProfessor of newProfessors) {
+      const professor = new this.professorModel(newProfessor);
+      const savedUser = this.userService.newUser({
+        email: newProfessor.email,
+        role: Role.PROFESSOR,
+      });
+      if (savedUser) await professor.save();
+    }
   }
 
   async getProfessorById(professorId: string): Promise<Professor> {
@@ -33,7 +35,7 @@ export class ProfessorsService {
   }
 
   async getProfessorByEmail(professorEmail: string): Promise<Professor> {
-    const professor = await this.professorModel.findById(professorEmail);
+    const professor = await this.professorModel.findOne({ email: professorEmail });
     if (!professor)
       throw new NotFoundException(`Professor ${professorEmail} not found`);
     return professor;
@@ -69,9 +71,5 @@ export class ProfessorsService {
     if (!professor)
       throw new NotFoundException(`Professor ${professorId} not found`);
   }
-
-  //fetch projects to be accepted by professors
-  //fetch projects to be validated by admin
-
 
 }

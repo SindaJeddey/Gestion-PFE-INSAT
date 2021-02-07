@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AcademicYearModule } from "../academic-year/academic-year.module";
 
 dotenv.config();
 @Module({
@@ -20,6 +21,7 @@ dotenv.config();
       secret: process.env['JWT-SECRET-KEY'],
     }),
     UsersModule,
+    AcademicYearModule,
   ],
   providers: [
     JwtStrategy,

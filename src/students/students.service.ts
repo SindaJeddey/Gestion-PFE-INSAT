@@ -16,13 +16,15 @@ export class StudentsService {
     private mailingService: MailingService,
   ) {}
 
-  async addStudent(newStudent: NewStudentDto): Promise<Student> {
-    const student = new this.studentModel(newStudent);
-    const savedStudent = await this.userService.newUser({
-      email: newStudent.email,
-      role: Role.STUDENT,
-    });
-    if (savedStudent) return await student.save();
+  async addStudents(newStudents: NewStudentDto[]) {
+    for (const newStudent of newStudents) {
+      const student = new this.studentModel(newStudent);
+      const savedStudent = await this.userService.newUser({
+        email: newStudent.email,
+        role: Role.STUDENT,
+      });
+      if (savedStudent) await student.save();
+    }
   }
 
   async getStudentByEmail(studentEmail: string): Promise<Student> {
