@@ -29,7 +29,7 @@ export class AuthenticationService {
       else {
         const academicYear = await this.academicYearService.getCurrentAcademicYear();
         const payload = { email: user.email, role: user.role, academicYear };
-        return { 'access-token': this.jwtService.sign(payload) };
+        return { accessToken: this.jwtService.sign(payload) };
       }
     }
   }
