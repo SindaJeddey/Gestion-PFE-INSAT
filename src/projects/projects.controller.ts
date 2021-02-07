@@ -68,17 +68,6 @@ export class ProjectsController {
     return await this.projectsService.getProjectsToBeValidatedByAdmin();
   }
 
-  @Get('session/:id')
-  @ApiOperation({
-    description: 'Retrieving projects of a given session',
-  })
-  @Roles(Role.ADMIN)
-  async getProjectsPerSession(
-    @Param('id') sessionId: string,
-  ): Promise<Project[]> {
-    return await this.projectsService.getProjectsPerSession(sessionId);
-  }
-
   @Get()
   @Roles(Role.STUDENT)
   @ApiOperation({ description: 'Retrieving a project by the student.' })

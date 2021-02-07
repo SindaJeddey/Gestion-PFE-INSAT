@@ -52,6 +52,11 @@ export class SessionsService {
     return session;
   }
 
+  async getSessionProjects(sessionId: string) {
+    const session = await this.getSession(sessionId);
+    return await this.projectsService.getProjectsPerSession(session);
+  }
+
   async updateSession(
     sessionId: string,
     updates: UpdatedSessionDto,

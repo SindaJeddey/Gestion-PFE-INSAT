@@ -24,6 +24,15 @@ export class SessionsController {
     return await this.sessionsService.getSession(sessionId);
   }
 
+  @Get('project/:id')
+  @Roles(Role.ADMIN, Role.STUDENT, Role.PROFESSOR)
+  @ApiOperation({ description: 'Get session projects.' })
+  @ApiResponse({ status: 200, description: 'Projects successfully retrieved.' })
+  @ApiResponse({ status: 404, description: 'Projects not found.' })
+  async getSessionProjects(@Param('id') sessionId: string) {
+    return this.sessionsService.getSessionProjects(sessionId);
+  }
+
   @Get()
   @Roles(Role.ADMIN)
   @ApiOperation({ description: 'Get current academic year sessions.' })

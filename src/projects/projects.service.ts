@@ -10,6 +10,7 @@ import { EnterprisesService } from "../enterprises/enterprises.service";
 import { AcademicYearService } from "../academic-year/academic-year.service";
 import { MailingService } from "../mailing/mailing.service";
 import { State } from "./model/state.enum";
+import { Session } from "../sessions/model/session.model";
 
 @Injectable()
 export class ProjectsService {
@@ -243,10 +244,10 @@ export class ProjectsService {
     return await this.projectModel.find({ validity: false }).exec();
   }
 
-  async getProjectsPerSession(sessionId: string): Promise<Project[]> {
+  async getProjectsPerSession(session: Session): Promise<Project[]> {
     return await this.projectModel
-      .find()
-      .populate({ path: 'session', match: { _id: sessionId } })
+      .find({ session })
+      .populate('session supervisor student')
       .exec();
   }
 }
