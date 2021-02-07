@@ -67,7 +67,7 @@ export class ProjectsService {
       academicYear: academicYear._id,
       enterprise,
       state: State.NONE,
-    });
+    }).populate('supervisor enterprise');
     const saved = await project.save();
     if (saved) {
       await this.mailingService.sendEmail(
@@ -81,7 +81,7 @@ export class ProjectsService {
         `Dear ${supervisor.name} ${supervisor.lastName},\n You have a new project pending. Please check the platform for more details.`,
       );
     }
-    return await this.projectModel.populate(saved, 'enterprise supervisor');
+    return project;
   }
 
   async getProject(projectId: string): Promise<Project> {
@@ -97,7 +97,7 @@ export class ProjectsService {
     const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel
       .findOne({ student: student, level: student.level })
-      .populate('student')
+      .populate('student supervisor enterprise')
       .exec();
     if (!project)
       throw new NotFoundException(
@@ -132,11 +132,9 @@ export class ProjectsService {
     updates: UpdatedProjectDto | any,
   ): Promise<Project> {
     const student = await this.studentsService.getStudentByEmail(studentEmail);
-    const project = await this.projectModel.findOneAndUpdate(
-      { student },
-      { ...updates },
-      { new: true },
-    ).populate('student');
+    const project = await this.projectModel
+      .findOneAndUpdate({ student }, { ...updates }, { new: true })
+      .populate('student session');
     if (!project)
       throw new NotFoundException(
         `Project for Student ${studentEmail} Not Found`,
