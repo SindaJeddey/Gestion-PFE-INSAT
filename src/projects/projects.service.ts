@@ -94,6 +94,13 @@ export class ProjectsService {
     else return project;
   }
 
+  async getAllProjects(): Promise<Project[]> {
+    return await this.projectModel
+      .find()
+      .populate('student supervisor enterprise session')
+      .exec();
+  }
+
   async getStudentCurrentProject(studentEmail: string): Promise<Project> {
     const student = await this.studentsService.getStudentByEmail(studentEmail);
     const project = await this.projectModel

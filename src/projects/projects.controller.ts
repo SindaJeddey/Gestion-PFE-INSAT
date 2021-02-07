@@ -58,6 +58,14 @@ export class ProjectsController {
     );
   }
 
+  @Get('all')
+  @ApiOperation({
+    description: 'Retrieving all projects',
+  })
+  async getAllProjects(): Promise<Project[]> {
+    return this.projectsService.getAllProjects();
+  }
+
   @Get('to-validate')
   @Roles(Role.ADMIN)
   @ApiOperation({
