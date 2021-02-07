@@ -12,7 +12,7 @@ import { NewProfessorDto } from './model/dto/new-professor.dto';
 import { Professor } from './model/professor.model';
 import { ProfessorsService } from './professors.service';
 import { UpdatedProfessorDto } from './model/dto/updated-professor.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
@@ -67,6 +67,7 @@ export class ProfessorsController {
   @Public()
   @ApiOperation({ description: 'Adding professors.' })
   @ApiResponse({ status: 201, description: 'Professors added successfully.' })
+  @ApiBody({ type: [NewProfessorDto] })
   async addProfessors(@Body() newProfessors: NewProfessorDto[]) {
     await this.professorsService.addNewProfessors(newProfessors);
   }

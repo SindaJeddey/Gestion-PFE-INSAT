@@ -3,7 +3,7 @@ import { StudentsService } from './students.service';
 import { NewStudentDto } from './model/dto/new-student.dto';
 import { Student } from './model/student.model';
 import { UpdatedStudentDto } from './model/dto/updated-student.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../users/model/role.enum';
 import { User } from '../decorators/user.decorator';
@@ -49,6 +49,7 @@ export class StudentsController {
   @Public()
   @ApiOperation({ description: 'Adding students.' })
   @ApiResponse({ status: 204, description: 'Students successfully added.' })
+  @ApiBody({ type: [NewStudentDto] })
   async addStudents(@Body() newStudents: NewStudentDto[]) {
     await this.studentsService.addStudents(newStudents);
   }
