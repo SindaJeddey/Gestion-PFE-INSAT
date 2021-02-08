@@ -255,7 +255,7 @@ export class ProjectsService {
   async getProjectsPerSession(session: Session): Promise<Project[]> {
     return await this.projectModel
       .find({ session })
-      .populate('session supervisor student')
+      .populate('session supervisor student enterprise')
       .exec();
   }
 }
