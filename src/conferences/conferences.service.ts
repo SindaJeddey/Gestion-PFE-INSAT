@@ -58,8 +58,8 @@ export class ConferencesService {
 
   private async verifyProjectValidity(projectId: string): Promise<Project> {
     const project = await this.projectsService.getProject(projectId);
-    if (!project.validity)
-      throw new BadRequestException(`Project ${projectId} not validated yet`);
+    // if (!project.validity)
+    //   throw new BadRequestException(`Project ${projectId} not validated yet`);
     if (project.state !== State.CONFIRMED && project.state !== State.PROGRAMMED)
       throw new BadRequestException(
         `Project ${projectId} not confirmed for yet`,
